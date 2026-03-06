@@ -12,6 +12,7 @@ library
     Deontic.Civil.Acts
     Deontic.Civil.Agency
     Deontic.Civil.Possession
+    Deontic.Civil.Prescription
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
@@ -69,6 +70,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.AgencySpec
     Deontic.Civil.CaseSpec
     Deontic.Civil.PossessionSpec
+    Deontic.Civil.PrescriptionSpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover

@@ -46,6 +46,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Acts             -- §103-104, §107-110 법률행위
   Deontic.Civil.Agency           -- §114-132 대리
   Deontic.Civil.Possession       -- §197, §200 점유 추정 (rebuttable presumptions)
+  Deontic.Civil.Prescription     -- §162, §168, §174 소멸시효 (temporal reasoning)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -65,6 +66,8 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §130 무권대리 | `UnauthAgencyAct` | (same stack) | Unauthorized → Pending; ratification → Valid |
 | §197 점유의 태양 | `PossessionAct` | `'[Rebuttal, Presumption]` | Presumed good faith; rebutted by bad faith/violence/secrecy |
 | §200 소유의사 추정 | `PossessionAct` | (same stack) | Presumed ownership intent; rebutted by contrary evidence |
+| §162 소멸시효 | `PrescriptionAct` | `'[Interruption, Expiration]` | Claim expires after statutory period; interruption resets clock |
+| §174 시효중단 효력 | `PrescriptionAct` | (same stack) | Interrupted prescription restarts from interruption point |
 
 ## Example
 
@@ -122,6 +125,8 @@ Layers are composable building blocks, not hardcoded to a specific stack.
 **Independent defects, not a giant stack.** Different defect types (`ShamAct`, `MistakeAct`, `FraudAct`) are separate act types with their own stacks. Combine independent verdicts with `verdictMeet` (Void > Voidable > Valid).
 
 **Rebuttable presumptions via layer defaults.** Legal presumptions ("A로 추정한다") map to a `Presumption` base layer (default Valid) with a `Rebuttal` override layer. The absence of rebuttal facts causes delegation → the presumption holds. No explicit negation needed.
+
+**Heterogeneous fact types.** The `Facts` type family lets each act type define its own fact structure. `MinorAct` uses `Set CivilFact` (boolean facts), while `PrescriptionAct` uses `PrescriptionFacts` (a record with numeric fields for temporal reasoning). The core framework doesn't care — it just threads `Facts act` through.
 
 ## Prior Art
 

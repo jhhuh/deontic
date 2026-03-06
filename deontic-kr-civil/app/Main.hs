@@ -17,6 +17,7 @@ import Deontic.Civil.Persons ()
 import Deontic.Civil.Acts ()
 import Deontic.Civil.Agency ()
 import Deontic.Civil.Possession ()
+import Deontic.Civil.Prescription ()
 import Deontic.Civil.Render (KoreanRenderer(..))
 
 main :: IO ()
@@ -39,6 +40,7 @@ repl = do
   TIO.putStrLn "  6) 유권대리 (§114, §118)"
   TIO.putStrLn "  7) 무권대리 (§125-132)"
   TIO.putStrLn "  8) 점유 추정 (§197, §200)"
+  TIO.putStrLn "  9) 소멸시효 (§162, §168, §174)"
   TIO.putStrLn "  q) 종료"
   TIO.putStr "> "
   hFlush stdout
@@ -55,6 +57,7 @@ repl = do
     Just "6" -> handleAuthAgency >> repl
     Just "7" -> handleUnauthAgency >> repl
     Just "8" -> handlePossession >> repl
+    Just "9" -> handlePrescription >> repl
     Just _   -> TIO.putStrLn "잘못된 입력입니다.\n" >> repl
 
 askFacts :: [(String, CivilFact)] -> IO (Set.Set CivilFact)
@@ -176,5 +179,34 @@ handlePossession = do
     , ("타주점유 (§200 반증)", NoOwnershipIntent)
     ]
   let j = query (PossessionAct actor actId) facts
+  TIO.putStrLn ""
+  TIO.putStrLn (renderJudgment KoreanRenderer j)
+
+handlePrescription :: IO ()
+handlePrescription = do
+  let creditor = PersonId "채권자"
+      claimId  = ActId "대여금채권"
+  TIO.putStr "\n소멸시효기간 (년): "
+  hFlush stdout
+  periodYears <- readLn :: IO Int
+  TIO.putStr "채권 발생 후 경과 기간 (년): "
+  hFlush stdout
+  elapsedYears <- readLn :: IO Int
+  TIO.putStr "시효중단 여부 (y/n): "
+  hFlush stdout
+  interrupted <- getLine
+  intAfter <- case interrupted of
+    "y" -> do
+      TIO.putStr "중단 시점 (채권 발생 후 년수): "
+      hFlush stdout
+      y <- readLn :: IO Int
+      pure (Just (y * 365))
+    _   -> pure Nothing
+  let facts = PrescriptionFacts
+        { pfElapsedDays = elapsedYears * 365
+        , pfPeriodDays = periodYears * 365
+        , pfInterruptedAfter = intAfter
+        }
+      j = query (PrescriptionAct creditor claimId) facts
   TIO.putStrLn ""
   TIO.putStrLn (renderJudgment KoreanRenderer j)

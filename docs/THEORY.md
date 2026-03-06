@@ -83,10 +83,27 @@ This is a **closed-world assumption** encoded in open-world machinery: the absen
 
 The `Presumption` and `Rebuttal` layer tokens are domain-specific (like `Ratification` and `ApparentAuth`), keeping the core framework unchanged.
 
+## Solved: Temporal Reasoning via Heterogeneous Facts
+
+The open `type family Facts act :: Type` enables temporal reasoning without changing the core framework. While most act types use `Set CivilFact` (atemporal boolean facts), `PrescriptionAct` uses a `PrescriptionFacts` record with numeric fields:
+
+```haskell
+data PrescriptionFacts = PrescriptionFacts
+  { pfElapsedDays      :: Int        -- days since claim arose
+  , pfPeriodDays       :: Int        -- statutory period
+  , pfInterruptedAfter :: Maybe Int  -- interruption point
+  }
+type instance Facts PrescriptionAct = PrescriptionFacts
+```
+
+The layers encode the legal structure:
+- **Expiration** (base, §162): `elapsed ≥ period → Void` (prescription complete)
+- **Interruption** (override, §174): recalculates from interruption point → `Valid` if the new elapsed time is within the period
+
+This demonstrates that the `Facts` type family is the escape hatch for richer fact structures. Any computable condition (time, arithmetic, external data) can be encoded as a domain-specific fact type without modifying the adjudication machinery.
+
 ## Open Questions
 
-1. **Temporal reasoning.** 소멸시효 (prescription/limitation periods) requires reasoning about time. The current fact-based approach has no temporal semantics.
+1. **Quantification.** Rules like "all parties must consent" require universal quantification over a set of persons. Currently this must be pre-computed and injected as facts.
 
-2. **Quantification.** Rules like "all parties must consent" require universal quantification over a set of persons. Currently this must be pre-computed and injected as facts.
-
-3. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?
+2. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?

@@ -7,9 +7,12 @@ module Deontic.Civil.Types
   , AuthAgencyAct(..)
   , UnauthAgencyAct(..)
   , PossessionAct(..)
+  , PrescriptionAct(..)
   , CivilFact(..)
+  , PrescriptionFacts(..)
   , Ratification, ApparentAuth
   , Presumption, Rebuttal
+  , Expiration, Interruption
   ) where
 
 import Data.Set (Set)
@@ -65,6 +68,20 @@ data PossessionAct = PossessionAct
   , paActId  :: ActId
   } deriving (Eq, Show)
 
+-- | 소멸시효 (민법 제162조, 제168조, 제174조)
+data PrescriptionAct = PrescriptionAct
+  { prCreditor :: PersonId
+  , prClaimId  :: ActId
+  } deriving (Eq, Show)
+
+-- | 소멸시효 판단에 필요한 시간적 사실관계
+-- (demonstrates Facts type family with a record, not a Set)
+data PrescriptionFacts = PrescriptionFacts
+  { pfElapsedDays      :: Int        -- 채권 발생 후 경과일수
+  , pfPeriodDays       :: Int        -- 소멸시효기간 (일)
+  , pfInterruptedAfter :: Maybe Int  -- 중단 시점 (채권 발생 후 일수), Nothing = 중단 없음
+  } deriving (Eq, Show)
+
 -- Layer tokens for agency
 data Ratification    -- 추인 (§130, §132)
 data ApparentAuth    -- 표현대리 (§125-129)
@@ -72,6 +89,10 @@ data ApparentAuth    -- 표현대리 (§125-129)
 -- Layer tokens for rebuttable presumptions
 data Presumption     -- 추정 (default rule)
 data Rebuttal        -- 반증 (rebuttal)
+
+-- Layer tokens for prescription (소멸시효)
+data Expiration      -- 시효만료 (§162)
+data Interruption    -- 시효중단 (§168, §174)
 
 -- | 민법 사실관계 (Korean Civil Act facts)
 data CivilFact
@@ -121,3 +142,4 @@ type instance Facts FraudAct         = Set CivilFact
 type instance Facts AuthAgencyAct    = Set CivilFact
 type instance Facts UnauthAgencyAct  = Set CivilFact
 type instance Facts PossessionAct    = Set CivilFact
+type instance Facts PrescriptionAct  = PrescriptionFacts
