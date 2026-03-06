@@ -71,12 +71,22 @@ These properties are verified by QuickCheck over all 4⁴ = 256 possible input c
 
 The unique contribution is using an existing industrial-strength type system (GHC) as both the logic engine and the soundness checker, producing first-class proof terms that can be rendered as natural-language legal reasoning.
 
+## Solved: Negation via Rebuttable Presumptions
+
+The system now encodes negation/default reasoning through **rebuttable presumptions**. The pattern:
+
+1. **Presumption layer** (base): asserts the default — e.g., §197 "점유자는 선의로 점유한 것으로 추정한다" → `Valid`
+2. **Rebuttal layer** (override): checks for counter-evidence — e.g., `BadFaith ∈ facts` → `Voidable`
+3. **Absence of rebuttal**: when no rebuttal facts are present, the override layer delegates to the presumption layer, and the default holds
+
+This is a **closed-world assumption** encoded in open-world machinery: the absence of a fact in the `Set` is semantically meaningful. We don't need explicit negation-as-failure — the layer structure naturally handles "A is presumed unless B is proven" by making B's absence trigger delegation.
+
+The `Presumption` and `Rebuttal` layer tokens are domain-specific (like `Ratification` and `ApparentAuth`), keeping the core framework unchanged.
+
 ## Open Questions
 
-1. **Negation.** The current system has no notion of "not proven." A fact is either in the set or not. This makes it impossible to encode rules like "unless the contrary is proven."
+1. **Temporal reasoning.** 소멸시효 (prescription/limitation periods) requires reasoning about time. The current fact-based approach has no temporal semantics.
 
-2. **Temporal reasoning.** 소멸시효 (prescription/limitation periods) requires reasoning about time. The current fact-based approach has no temporal semantics.
+2. **Quantification.** Rules like "all parties must consent" require universal quantification over a set of persons. Currently this must be pre-computed and injected as facts.
 
-3. **Quantification.** Rules like "all parties must consent" require universal quantification over a set of persons. Currently this must be pre-computed and injected as facts.
-
-4. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?
+3. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?

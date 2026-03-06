@@ -6,8 +6,10 @@ module Deontic.Civil.Types
   , FraudAct(..)
   , AuthAgencyAct(..)
   , UnauthAgencyAct(..)
+  , PossessionAct(..)
   , CivilFact(..)
   , Ratification, ApparentAuth
+  , Presumption, Rebuttal
   ) where
 
 import Data.Set (Set)
@@ -57,9 +59,19 @@ data UnauthAgencyAct = UnauthAgencyAct
   , uaaActId     :: ActId
   } deriving (Eq, Show)
 
+-- | 점유권 추정 (민법 제197조, 제200조)
+data PossessionAct = PossessionAct
+  { paActor  :: PersonId
+  , paActId  :: ActId
+  } deriving (Eq, Show)
+
 -- Layer tokens for agency
 data Ratification    -- 추인 (§130, §132)
 data ApparentAuth    -- 표현대리 (§125-129)
+
+-- Layer tokens for rebuttable presumptions
+data Presumption     -- 추정 (default rule)
+data Rebuttal        -- 반증 (rebuttal)
 
 -- | 민법 사실관계 (Korean Civil Act facts)
 data CivilFact
@@ -94,6 +106,11 @@ data CivilFact
   | AuthorityExpired           -- §129 대리권 소멸
   -- §130, §132 무권대리
   | Ratified                   -- 추인
+  -- §197, §200 점유 추정의 반증
+  | BadFaith                   -- 악의 (반증: §197)
+  | ViolentPossession          -- 강폭 점유 (반증: §197)
+  | ClandestinePossession      -- 은비 점유 (반증: §197)
+  | NoOwnershipIntent          -- 타주점유 (반증: §200)
   deriving (Eq, Ord, Show)
 
 type instance Facts MinorAct    = Set CivilFact
@@ -103,3 +120,4 @@ type instance Facts MistakeAct  = Set CivilFact
 type instance Facts FraudAct         = Set CivilFact
 type instance Facts AuthAgencyAct    = Set CivilFact
 type instance Facts UnauthAgencyAct  = Set CivilFact
+type instance Facts PossessionAct    = Set CivilFact

@@ -45,6 +45,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Persons          -- §5 미성년자의 법률행위
   Deontic.Civil.Acts             -- §103-104, §107-110 법률행위
   Deontic.Civil.Agency           -- §114-132 대리
+  Deontic.Civil.Possession       -- §197, §200 점유 추정 (rebuttable presumptions)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -62,6 +63,8 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §114 유권대리 | `AuthAgencyAct` | `'[Proviso, Base]` | Authorized agency → Valid; self-dealing → Voidable |
 | §125-129 표현대리 | `UnauthAgencyAct` | `'[ApparentAuth, Ratification, Base]` | Apparent authority → Valid |
 | §130 무권대리 | `UnauthAgencyAct` | (same stack) | Unauthorized → Pending; ratification → Valid |
+| §197 점유의 태양 | `PossessionAct` | `'[Rebuttal, Presumption]` | Presumed good faith; rebutted by bad faith/violence/secrecy |
+| §200 소유의사 추정 | `PossessionAct` | (same stack) | Presumed ownership intent; rebutted by contrary evidence |
 
 ## Example
 
@@ -117,6 +120,8 @@ instance Adjudicate act rest => Adjudicate act (Proviso ': rest)
 Layers are composable building blocks, not hardcoded to a specific stack.
 
 **Independent defects, not a giant stack.** Different defect types (`ShamAct`, `MistakeAct`, `FraudAct`) are separate act types with their own stacks. Combine independent verdicts with `verdictMeet` (Void > Voidable > Valid).
+
+**Rebuttable presumptions via layer defaults.** Legal presumptions ("A로 추정한다") map to a `Presumption` base layer (default Valid) with a `Rebuttal` override layer. The absence of rebuttal facts causes delegation → the presumption holds. No explicit negation needed.
 
 ## Prior Art
 

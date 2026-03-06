@@ -16,6 +16,7 @@ import Deontic.Civil.Types
 import Deontic.Civil.Persons ()
 import Deontic.Civil.Acts ()
 import Deontic.Civil.Agency ()
+import Deontic.Civil.Possession ()
 import Deontic.Civil.Render (KoreanRenderer(..))
 
 main :: IO ()
@@ -37,6 +38,7 @@ repl = do
   TIO.putStrLn "  5) 사기·강박에 의한 의사표시 (§110)"
   TIO.putStrLn "  6) 유권대리 (§114, §118)"
   TIO.putStrLn "  7) 무권대리 (§125-132)"
+  TIO.putStrLn "  8) 점유 추정 (§197, §200)"
   TIO.putStrLn "  q) 종료"
   TIO.putStr "> "
   hFlush stdout
@@ -52,6 +54,7 @@ repl = do
     Just "5" -> handleFraudAct >> repl
     Just "6" -> handleAuthAgency >> repl
     Just "7" -> handleUnauthAgency >> repl
+    Just "8" -> handlePossession >> repl
     Just _   -> TIO.putStrLn "잘못된 입력입니다.\n" >> repl
 
 askFacts :: [(String, CivilFact)] -> IO (Set.Set CivilFact)
@@ -159,5 +162,19 @@ handleUnauthAgency = do
     , ("대리권 소멸 후 선의의 제3자 (§129)", AuthorityExpired)
     ]
   let j = query (UnauthAgencyAct principal agent actId) facts
+  TIO.putStrLn ""
+  TIO.putStrLn (renderJudgment KoreanRenderer j)
+
+handlePossession :: IO ()
+handlePossession = do
+  let actor = PersonId "점유자"
+      actId = ActId "점유"
+  facts <- askFacts
+    [ ("악의 점유 (§197 반증)", BadFaith)
+    , ("강폭 점유 (§197 반증)", ViolentPossession)
+    , ("은비 점유 (§197 반증)", ClandestinePossession)
+    , ("타주점유 (§200 반증)", NoOwnershipIntent)
+    ]
+  let j = query (PossessionAct actor actId) facts
   TIO.putStrLn ""
   TIO.putStrLn (renderJudgment KoreanRenderer j)
