@@ -22,31 +22,31 @@ instance Adjudicate JuristicAct '[Base] where
           "법률행위의 일반적 유효 추정"
 
 -- 제107조 ② — Proviso layer
-instance Adjudicate JuristicAct '[Base]
-      => Adjudicate JuristicAct '[Proviso, Base] where
+instance Adjudicate JuristicAct rest
+      => Adjudicate JuristicAct (Proviso ': rest) where
   adjudicate act facts
     | Custom "hidden-intention" `Set.member` facts
       && Custom "counterparty-knew" `Set.member` facts =
-        JOverride (adjudicate @_ @'[Base] act facts)
+        JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 107 (Just 2))
                   "상대방이 표의자의 진의아님을 알았거나 알 수 있었을 경우에는 무효로 한다."
     | otherwise =
-        JDelegate (adjudicate @_ @'[Base] act facts)
+        JDelegate (adjudicate @_ @rest act facts)
 
 -- 제103조, 제104조 — SpecialRule layer (overrides everything)
-instance Adjudicate JuristicAct '[Proviso, Base]
-      => Adjudicate JuristicAct '[SpecialRule, Proviso, Base] where
+instance Adjudicate JuristicAct rest
+      => Adjudicate JuristicAct (SpecialRule ': rest) where
   adjudicate act facts
     | Custom "contra-bonos-mores" `Set.member` facts =
-        JOverride (adjudicate @_ @'[Proviso, Base] act facts)
+        JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 103 Nothing)
                   "선량한 풍속 기타 사회질서에 위반한 사항을 내용으로 하는 법률행위는 무효로 한다."
     | Custom "exploitative-act" `Set.member` facts =
-        JOverride (adjudicate @_ @'[Proviso, Base] act facts)
+        JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 104 Nothing)
                   "당사자의 궁박, 경솔 또는 무경험으로 인하여 현저하게 공정을 잃은 법률행위는 무효로 한다."
     | otherwise =
-        JDelegate (adjudicate @_ @'[Proviso, Base] act facts)
+        JDelegate (adjudicate @_ @rest act facts)

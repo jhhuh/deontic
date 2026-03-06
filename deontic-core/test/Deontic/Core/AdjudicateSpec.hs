@@ -16,16 +16,16 @@ type instance Resolvable TestAct = '[Proviso, Base]
 instance Adjudicate TestAct '[Base] where
   adjudicate _ _ = JBase Voidable (ArticleRef "test" 1 Nothing) "base rule"
 
-instance Adjudicate TestAct '[Base]
-      => Adjudicate TestAct '[Proviso, Base] where
+instance Adjudicate TestAct rest
+      => Adjudicate TestAct (Proviso ': rest) where
   adjudicate act facts
     | Custom "exception" `Set.member` facts =
-        JOverride (adjudicate @_ @'[Base] act facts)
+        JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "test" 1 (Just 2))
                   "exception applies"
     | otherwise =
-        JDelegate (adjudicate @_ @'[Base] act facts)
+        JDelegate (adjudicate @_ @rest act facts)
 
 spec :: Spec
 spec = do

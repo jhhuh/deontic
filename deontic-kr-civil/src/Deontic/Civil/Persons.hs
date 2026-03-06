@@ -25,16 +25,16 @@ instance Adjudicate MinorAct '[Base] where
 
 -- 제5조 ① 단서
 -- "권리만을 얻거나 의무만을 면하는 법률행위는 그러하지 아니하다."
-instance Adjudicate MinorAct '[Base]
-      => Adjudicate MinorAct '[Proviso, Base] where
+instance Adjudicate MinorAct rest
+      => Adjudicate MinorAct (Proviso ': rest) where
   adjudicate act facts
     | Custom "merely-acquires-right" `Set.member` facts =
-        JOverride (adjudicate @_ @'[Base] act facts)
+        JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "민법" 5 (Just 1))
                   "권리만을 얻거나 의무만을 면하는 법률행위는 그러하지 아니하다."
     | otherwise =
-        JDelegate (adjudicate @_ @'[Base] act facts)
+        JDelegate (adjudicate @_ @rest act facts)
 
 hasConsent :: ActId -> Facts -> Bool
 hasConsent actId facts =

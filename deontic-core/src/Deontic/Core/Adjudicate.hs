@@ -10,13 +10,13 @@ import Data.Text (Text)
 import GHC.TypeLits (TypeError, ErrorMessage(..))
 import Deontic.Core.Types (ArticleRef, Facts)
 import Deontic.Core.Verdict (Verdict)
-import Deontic.Core.Layer (Base, Resolvable)
+import Deontic.Core.Layer (Resolvable)
 
 -- | Judgment GADT — carries the full reasoning chain in its type
 data Judgment (layers :: [Type]) where
-  -- | Direct rule application (base layer)
+  -- | Direct rule application (bottom layer — any layer token)
   JBase     :: Verdict -> ArticleRef -> Text
-            -> Judgment '[Base]
+            -> Judgment '[l]
   -- | This layer overrides the verdict from a lower layer
   JOverride :: Judgment prev -> Verdict -> ArticleRef -> Text
             -> Judgment (l ': prev)
