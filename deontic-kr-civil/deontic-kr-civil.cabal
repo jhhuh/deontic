@@ -71,6 +71,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.ActsSpec
     Deontic.Civil.AgencySpec
     Deontic.Civil.CaseSpec
+    Deontic.Civil.CaseStudySpec
     Deontic.Civil.CoOwnershipSpec
     Deontic.Civil.PossessionSpec
     Deontic.Civil.PrescriptionSpec
