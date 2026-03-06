@@ -2,6 +2,7 @@ module Deontic.Civil.CaseStudySpec (spec) where
 
 import Test.Hspec
 import qualified Data.Set as Set
+import Data.Time.Calendar (fromGregorian)
 import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
@@ -63,11 +64,13 @@ spec = do
       verdict fraudJ `shouldBe` Voidable
 
     -- ─── 쟁점 4: 소멸시효 (§162) ───
+    -- 법률행위일: 2005-01-01, 판단 시점: 2018-06-01 (13년 경과)
     let prescJ = query (PrescriptionAct 병 actId)
                        (PrescriptionFacts
-                         { pfElapsedDays = 13 * 365  -- 13년 경과
-                         , pfPeriodDays = 10 * 365   -- 10년 소멸시효
-                         , pfInterruptedAfter = Nothing
+                         { pfClaimDate   = fromGregorian 2005 1 1
+                         , pfCurrentDate = fromGregorian 2018 6 1  -- 13년 경과
+                         , pfPeriodYears = 10
+                         , pfInterruptedOn = Nothing
                          })
 
     it "쟁점4 §162: 13년 > 10년 → Void (소멸시효 완성)" $ do
@@ -87,9 +90,10 @@ spec = do
     -- ─── 만약 소멸시효 기간 내였다면? ───
     let prescJ' = query (PrescriptionAct 병 actId)
                         (PrescriptionFacts
-                          { pfElapsedDays = 5 * 365
-                          , pfPeriodDays = 10 * 365
-                          , pfInterruptedAfter = Nothing
+                          { pfClaimDate   = fromGregorian 2005 1 1
+                          , pfCurrentDate = fromGregorian 2010 1 1  -- 5년 경과
+                          , pfPeriodYears = 10
+                          , pfInterruptedOn = Nothing
                           })
         allJudgments' =
           [ SomeJudgment minorJ

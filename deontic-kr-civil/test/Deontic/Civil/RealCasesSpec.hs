@@ -2,6 +2,7 @@ module Deontic.Civil.RealCasesSpec (spec) where
 
 import Test.Hspec
 import qualified Data.Set as Set
+import Data.Time.Calendar (fromGregorian)
 import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
@@ -241,22 +242,24 @@ spec = do
   describe "§162 소멸시효 — 판례 기반" $ do
     let 채권자 = PersonId "채권자"
 
+    let claimDate = fromGregorian 2010 1 1
+
     -- 일반 채권: 10년 소멸시효 (§162①)
     it "대여금 채권 9년 경과 → Valid (시효 미완성)" $ do
       let j = query (PrescriptionAct 채권자 (ActId "대여금"))
-                (PrescriptionFacts (9 * 365) (10 * 365) Nothing)
+                (PrescriptionFacts claimDate (fromGregorian 2019 1 1) 10 Nothing)
       verdict j `shouldBe` Valid
 
     it "대여금 채권 11년 경과 → Void (시효 완성)" $ do
       let j = query (PrescriptionAct 채권자 (ActId "대여금"))
-                (PrescriptionFacts (11 * 365) (10 * 365) Nothing)
+                (PrescriptionFacts claimDate (fromGregorian 2021 1 1) 10 Nothing)
       verdict j `shouldBe` Void
 
     -- 단기소멸시효: 3년 (§163)
     -- 이자, 부양료, 급료, 봉급, 용역비 등
     it "용역비 채권 4년 경과 → Void (3년 단기시효 완성)" $ do
       let j = query (PrescriptionAct 채권자 (ActId "용역비"))
-                (PrescriptionFacts (4 * 365) (3 * 365) Nothing)
+                (PrescriptionFacts claimDate (fromGregorian 2014 1 1) 3 Nothing)
       verdict j `shouldBe` Void
 
     -- 대법원 93다47745: 채무승인에 의한 시효중단
@@ -264,13 +267,15 @@ spec = do
     --  승인을 한 것으로 보아 시효중단의 효력을 인정"
     it "11년 경과 but 8년차 채무승인 → Valid (시효중단, 대법원 93다47745)" $ do
       let j = query (PrescriptionAct 채권자 (ActId "대여금"))
-                (PrescriptionFacts (11 * 365) (10 * 365) (Just (8 * 365)))
+                (PrescriptionFacts claimDate (fromGregorian 2021 1 1) 10
+                  (Just (fromGregorian 2018 1 1)))  -- 8년차 중단
       verdict j `shouldBe` Valid
 
     -- 중단 후에도 새 시효기간 경과
     it "20년 경과, 8년차 중단 → Void (중단 후 12년 > 10년)" $ do
       let j = query (PrescriptionAct 채권자 (ActId "대여금"))
-                (PrescriptionFacts (20 * 365) (10 * 365) (Just (8 * 365)))
+                (PrescriptionFacts claimDate (fromGregorian 2030 1 1) 10
+                  (Just (fromGregorian 2018 1 1)))
       verdict j `shouldBe` Void
 
   -- ─────────────────────────────────────────────
@@ -371,7 +376,7 @@ spec = do
                , SomeJudgment $ query (FraudAct 갑 (ActId "매매"))
                    Set.empty
                , SomeJudgment $ query (PrescriptionAct 갑 (ActId "매매"))
-                   (PrescriptionFacts (3 * 365) (10 * 365) Nothing)
+                   (PrescriptionFacts (fromGregorian 2020 1 1) (fromGregorian 2023 1 1) 10 Nothing)
                ]
       combineVerdicts js `shouldBe` Voidable
 
@@ -393,7 +398,7 @@ spec = do
       let js = [ SomeJudgment $ query (ShamAct (PersonId "원소유자") (ActId "명의이전"))
                    (Set.singleton BonaFideThirdParty)
                , SomeJudgment $ query (PrescriptionAct (PersonId "원소유자") (ActId "명의이전"))
-                   (PrescriptionFacts (5 * 365) (10 * 365) Nothing)
+                   (PrescriptionFacts (fromGregorian 2015 1 1) (fromGregorian 2020 1 1) 10 Nothing)
                ]
       combineVerdicts js `shouldBe` Valid
 
@@ -415,7 +420,7 @@ spec = do
                    (PersonId "가해자") (ActId "사고"))
                    (TortFacts True True True True False)
                , SomeJudgment $ query (PrescriptionAct (PersonId "피해자") (ActId "사고"))
-                   (PrescriptionFacts (12 * 365) (10 * 365) Nothing)
+                   (PrescriptionFacts (fromGregorian 2010 1 1) (fromGregorian 2022 1 1) 10 Nothing)
                ]
       combineVerdicts js `shouldBe` Void
 

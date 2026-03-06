@@ -15,13 +15,20 @@ library
     Deontic.Civil.Possession
     Deontic.Civil.Prescription
     Deontic.Civil.Tort
+    Deontic.Civil.Rescission
+    Deontic.Civil.PropertyTransfer
+    Deontic.Civil.AcquisitivePrescription
+    Deontic.Civil.DefaultObligation
+    Deontic.Civil.SaleWarranty
+    Deontic.Civil.Lease
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
     base       >= 4.17 && < 5,
     deontic-core,
     containers >= 0.6,
-    text       >= 2.0
+    text       >= 2.0,
+    time       >= 1.11
   default-language: GHC2021
   default-extensions:
     GADTs
@@ -43,7 +50,8 @@ executable deontic-kr-civil-cli
     deontic-core,
     deontic-kr-civil,
     containers >= 0.6,
-    text       >= 2.0
+    text       >= 2.0,
+    time       >= 1.11
   default-language: GHC2021
   default-extensions:
     GADTs
@@ -65,6 +73,7 @@ test-suite deontic-kr-civil-test
     deontic-core,
     containers >= 0.6,
     text       >= 2.0,
+    time       >= 1.11,
     hspec      >= 2.0
   other-modules:
     Deontic.Civil.PersonsSpec
@@ -77,6 +86,12 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.PossessionSpec
     Deontic.Civil.PrescriptionSpec
     Deontic.Civil.TortSpec
+    Deontic.Civil.RescissionSpec
+    Deontic.Civil.PropertyTransferSpec
+    Deontic.Civil.AcquisitivePrescriptionSpec
+    Deontic.Civil.DefaultObligationSpec
+    Deontic.Civil.SaleWarrantySpec
+    Deontic.Civil.LeaseSpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover

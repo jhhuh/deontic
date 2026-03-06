@@ -8,6 +8,7 @@ import qualified Data.Text.IO as TIO
 import System.IO (hFlush, stdout, hSetEncoding, utf8)
 import System.IO.Error (isEOFError)
 
+import Data.Time.Calendar (fromGregorian)
 import Deontic.Core.Types (PersonId(..), ActId(..))
 import Deontic.Core.Verdict (Verdict(..))
 import Deontic.Core.Adjudicate (query)
@@ -195,23 +196,45 @@ handlePrescription = do
   TIO.putStr "\n소멸시효기간 (년): "
   hFlush stdout
   periodYears <- readLn :: IO Int
-  TIO.putStr "채권 발생 후 경과 기간 (년): "
+  TIO.putStr "채권 발생 연도 (예: 2015): "
   hFlush stdout
-  elapsedYears <- readLn :: IO Int
+  claimYear <- readLn :: IO Integer
+  TIO.putStr "채권 발생 월 (1-12): "
+  hFlush stdout
+  claimMonth <- readLn :: IO Int
+  TIO.putStr "채권 발생 일 (1-31): "
+  hFlush stdout
+  claimDay <- readLn :: IO Int
+  TIO.putStr "판단 시점 연도 (예: 2026): "
+  hFlush stdout
+  curYear <- readLn :: IO Integer
+  TIO.putStr "판단 시점 월 (1-12): "
+  hFlush stdout
+  curMonth <- readLn :: IO Int
+  TIO.putStr "판단 시점 일 (1-31): "
+  hFlush stdout
+  curDay <- readLn :: IO Int
   TIO.putStr "시효중단 여부 (y/n): "
   hFlush stdout
   interrupted <- getLine
-  intAfter <- case interrupted of
+  intDate <- case interrupted of
     "y" -> do
-      TIO.putStr "중단 시점 (채권 발생 후 년수): "
+      TIO.putStr "중단 시점 연도: "
       hFlush stdout
-      y <- readLn :: IO Int
-      pure (Just (y * 365))
+      iy <- readLn :: IO Integer
+      TIO.putStr "중단 시점 월: "
+      hFlush stdout
+      im <- readLn :: IO Int
+      TIO.putStr "중단 시점 일: "
+      hFlush stdout
+      iday <- readLn :: IO Int
+      pure (Just (fromGregorian iy im iday))
     _   -> pure Nothing
   let facts = PrescriptionFacts
-        { pfElapsedDays = elapsedYears * 365
-        , pfPeriodDays = periodYears * 365
-        , pfInterruptedAfter = intAfter
+        { pfClaimDate   = fromGregorian claimYear claimMonth claimDay
+        , pfCurrentDate = fromGregorian curYear curMonth curDay
+        , pfPeriodYears = periodYears
+        , pfInterruptedOn = intDate
         }
       j = query (PrescriptionAct creditor claimId) facts
   TIO.putStrLn ""
