@@ -2,6 +2,7 @@
 module Deontic.Render
   ( Renderer(..)
   , judgmentSteps
+  , someJudgmentSteps
   , Step(..)
   , StepKind(..)
   ) where
@@ -9,7 +10,7 @@ module Deontic.Render
 import Data.Text (Text)
 import Deontic.Core.Types (ArticleRef)
 import Deontic.Core.Verdict (Verdict)
-import Deontic.Core.Adjudicate (Judgment(..))
+import Deontic.Core.Adjudicate (Judgment(..), SomeJudgment(..))
 
 -- | A single step in the reasoning chain
 data Step = Step
@@ -30,6 +31,10 @@ judgmentSteps (JOverride prev v ref txt) =
   judgmentSteps prev ++ [Step Overridden v ref txt]
 judgmentSteps (JDelegate prev) =
   judgmentSteps prev
+
+-- | Extract steps from an existentially-wrapped judgment
+someJudgmentSteps :: SomeJudgment -> [Step]
+someJudgmentSteps (SomeJudgment j) = judgmentSteps j
 
 -- | Renderer typeclass — jurisdiction-specific output
 class Renderer r where

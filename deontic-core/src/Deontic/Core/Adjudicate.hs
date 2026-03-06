@@ -3,13 +3,17 @@ module Deontic.Core.Adjudicate
   , Judgment(..)
   , verdict
   , query
+  , SomeJudgment(..)
+  , someVerdict
+  , combineVerdicts
   ) where
 
 import Data.Kind (Type)
 import Data.Text (Text)
 import GHC.TypeLits (TypeError, ErrorMessage(..))
 import Deontic.Core.Types (ArticleRef, Facts)
-import Deontic.Core.Verdict (Verdict)
+import Data.List (foldl')
+import Deontic.Core.Verdict (Verdict(..), verdictMeet)
 import Deontic.Core.Layer (Resolvable)
 
 -- | Judgment GADT — carries the full reasoning chain in its type
@@ -44,3 +48,15 @@ instance TypeError
 -- | Top-level query using Resolvable to determine the layer stack
 query :: forall act. Adjudicate act (Resolvable act) => act -> Facts act -> Judgment (Resolvable act)
 query act facts = adjudicate act facts
+
+-- | Existential wrapper — hides the layer type for heterogeneous collections
+data SomeJudgment where
+  SomeJudgment :: Judgment layers -> SomeJudgment
+
+-- | Extract verdict from an existentially-wrapped judgment
+someVerdict :: SomeJudgment -> Verdict
+someVerdict (SomeJudgment j) = verdict j
+
+-- | Combine independent judgments: fold verdicts with meet
+combineVerdicts :: [SomeJudgment] -> Verdict
+combineVerdicts = foldl' (\acc sj -> verdictMeet acc (someVerdict sj)) Valid

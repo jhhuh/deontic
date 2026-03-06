@@ -66,6 +66,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.PersonsSpec
     Deontic.Civil.ActsSpec
     Deontic.Civil.AgencySpec
+    Deontic.Civil.CaseSpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover
