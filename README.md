@@ -54,8 +54,14 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Agency           -- §114-132 대리
   Deontic.Civil.CoOwnership      -- §264 공유물의 처분 (universal quantification)
   Deontic.Civil.Possession       -- §197, §200 점유 추정 (rebuttable presumptions)
-  Deontic.Civil.Prescription     -- §162, §168, §174 소멸시효 (temporal reasoning)
+  Deontic.Civil.Prescription     -- §162, §168, §174 소멸시효 (calendar year, §157)
   Deontic.Civil.Tort             -- §750, §396 불법행위 (multi-element + contributory neg)
+  Deontic.Civil.Rescission       -- §146 취소의 제척기간 (3년/10년, calendar year)
+  Deontic.Civil.PropertyTransfer -- §186-188 물권변동 (formality + lex specialis)
+  Deontic.Civil.AcquisitivePrescription -- §245 취득시효 (20년/10년, calendar year)
+  Deontic.Civil.DefaultObligation -- §387-390 채무불이행 (breach + creditor defense)
+  Deontic.Civil.SaleWarranty     -- §580-582 하자담보책임 (defect + buyer knowledge)
+  Deontic.Civil.Lease            -- §618-640 임대차 (obligation + implicit renewal)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -80,6 +86,20 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §264 공유물의 처분 | `CoOwnershipAct` | `'[Base]` | Universal quantification: all co-owners must consent |
 | §750 불법행위 | `TortAct` | `'[ContributoryNeg, Base]` | All 4 elements required; contributory negligence reduces |
 | §396 과실상계 | `TortAct` | (same stack) | Victim negligence reduces liability (Void → Voidable) |
+| §146 취소의 제척기간 | `RescissionAct` | `'[Base]` | 3-year/10-year exclusion period (calendar year, §157) |
+| §186 부동산물권변동 | `PropertyTransferAct` | `'[FormException, Base]` | Registration required for real property |
+| §187 등기불요 물권취득 | `PropertyTransferAct` | (same stack) | Inheritance/court order bypass registration |
+| §188 동산물권양도 | `PropertyTransferAct` | (same stack) | Delivery required for movables |
+| §245① 취득시효 | `AcqPrescriptionAct` | `'[ShortPrescription, Base]` | 20-year acquisitive prescription (calendar year) |
+| §245② 단기취득시효 | `AcqPrescriptionAct` | (same stack) | 10-year if good faith + no negligence |
+| §387-389 채무불이행 | `DefaultAct` | `'[CreditorDefense, Base]` | Non-performance + debtor fault → liability |
+| §390 채권자과실 | `DefaultAct` | (same stack) | Creditor fault reduces liability (Void → Voidable) |
+| §580 하자담보 | `WarrantyAct` | `'[BuyerKnowledge, Base]` | Defect → liability; significant defect → rescission |
+| §580② 매수인 악의 | `WarrantyAct` | (same stack) | Buyer knew of defect → no warranty |
+| §582 통지기간 | `WarrantyAct` | (same stack) | 6-month notification requirement |
+| §618 임대차 | `LeaseAct` | `'[RenewalRight, Base]` | Lease validity and expiration |
+| §639 묵시적 갱신 | `LeaseAct` | (same stack) | Implicit renewal: continued use + no objection |
+| §640 차임연체 해지 | `LeaseAct` | (same stack) | 2-period rent arrears → termination |
 | **BGB (German)** | | | |
 | §104 Geschäftsunfähigkeit | `CapacityAct` | `'[SpecialRule, Proviso, Base]` | Under 7 or permanently incapable → Void |
 | §106 beschränkte Geschäftsfähigkeit | `CapacityAct` | (same stack) | Minor without consent → Voidable |
@@ -143,7 +163,9 @@ Layers are composable building blocks, not hardcoded to a specific stack.
 
 **Rebuttable presumptions via layer defaults.** Legal presumptions ("A로 추정한다") map to a `Presumption` base layer (default Valid) with a `Rebuttal` override layer. The absence of rebuttal facts causes delegation → the presumption holds. No explicit negation needed.
 
-**Heterogeneous fact types.** The `Facts` type family lets each act type define its own fact structure. `MinorAct` uses `Set CivilFact` (boolean facts), while `PrescriptionAct` uses `PrescriptionFacts` (a record with numeric fields for temporal reasoning). The core framework doesn't care — it just threads `Facts act` through.
+**Heterogeneous fact types.** The `Facts` type family lets each act type define its own fact structure. `MinorAct` uses `Set CivilFact` (boolean facts), while `PrescriptionAct` uses `PrescriptionFacts` (a record with `Day` fields for temporal reasoning). The core framework doesn't care — it just threads `Facts act` through.
+
+**Calendar year computation (§157).** All temporal modules use `Data.Time.Day` with `addGregorianYearsClip` for proper calendar year arithmetic per §157 ("기간을 연으로 정한 때에는 역에 의하여 계산한다"). This correctly handles leap years — `2020-02-29 + 1년 = 2021-02-28`.
 
 ## Prior Art
 

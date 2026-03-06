@@ -89,16 +89,19 @@ The open `type family Facts act :: Type` enables temporal reasoning without chan
 
 ```haskell
 data PrescriptionFacts = PrescriptionFacts
-  { pfElapsedDays      :: Int        -- days since claim arose
-  , pfPeriodDays       :: Int        -- statutory period
-  , pfInterruptedAfter :: Maybe Int  -- interruption point
+  { pfClaimDate     :: Day        -- 채권 발생일
+  , pfCurrentDate   :: Day        -- 판단 시점
+  , pfPeriodYears   :: Int        -- 소멸시효기간 (년)
+  , pfInterruptedOn :: Maybe Day  -- 중단 시점
   }
 type instance Facts PrescriptionAct = PrescriptionFacts
 ```
 
 The layers encode the legal structure:
-- **Expiration** (base, §162): `elapsed ≥ period → Void` (prescription complete)
-- **Interruption** (override, §174): recalculates from interruption point → `Valid` if the new elapsed time is within the period
+- **Expiration** (base, §162): `addGregorianYearsClip period claimDate <= currentDate → Void`
+- **Interruption** (override, §174): recalculates from interruption date → `Valid` if within period
+
+Date arithmetic uses `addGregorianYearsClip` from `Data.Time.Calendar`, implementing §157's calendar-year computation (역에 의한 계산). This correctly handles leap years — e.g., `2020-02-29 + 1년 = 2021-02-28`.
 
 This demonstrates that the `Facts` type family is the escape hatch for richer fact structures. Any computable condition (time, arithmetic, external data) can be encoded as a domain-specific fact type without modifying the adjudication machinery.
 
