@@ -102,8 +102,26 @@ The layers encode the legal structure:
 
 This demonstrates that the `Facts` type family is the escape hatch for richer fact structures. Any computable condition (time, arithmetic, external data) can be encoded as a domain-specific fact type without modifying the adjudication machinery.
 
+## Solved: Quantification via Heterogeneous Facts
+
+Universal quantification ("공유자 전원의 동의", §264) follows the same pattern as temporal reasoning: the open `Facts` type family carries structured data, and the instance body uses standard Haskell for the check:
+
+```haskell
+data CoOwnershipFacts = CoOwnershipFacts
+  { cofOwners    :: [PersonId]
+  , cofConsented :: Set PersonId
+  }
+type instance Facts CoOwnershipAct = CoOwnershipFacts
+
+-- ∀ owner ∈ owners, owner ∈ consented
+instance Adjudicate CoOwnershipAct '[Base] where
+  adjudicate _ facts
+    | all (`Set.member` cofConsented facts) (cofOwners facts) = JBase Valid ...
+    | otherwise = JBase Void ...
+```
+
+The key insight: quantification doesn't need a new framework feature. The `Facts` type family + Haskell's own computation (`all`, `any`, `length`, arithmetic) handles boolean, temporal, and quantified conditions uniformly. The framework provides the *defeasibility structure*; the *domain logic* lives in the instance body.
+
 ## Open Questions
 
-1. **Quantification.** Rules like "all parties must consent" require universal quantification over a set of persons. Currently this must be pre-computed and injected as facts.
-
-2. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?
+1. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?

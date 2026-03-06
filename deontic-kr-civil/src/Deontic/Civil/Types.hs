@@ -8,8 +8,10 @@ module Deontic.Civil.Types
   , UnauthAgencyAct(..)
   , PossessionAct(..)
   , PrescriptionAct(..)
+  , CoOwnershipAct(..)
   , CivilFact(..)
   , PrescriptionFacts(..)
+  , CoOwnershipFacts(..)
   , Ratification, ApparentAuth
   , Presumption, Rebuttal
   , Expiration, Interruption
@@ -82,6 +84,18 @@ data PrescriptionFacts = PrescriptionFacts
   , pfInterruptedAfter :: Maybe Int  -- 중단 시점 (채권 발생 후 일수), Nothing = 중단 없음
   } deriving (Eq, Show)
 
+-- | 공유물의 처분 (민법 제264조)
+data CoOwnershipAct = CoOwnershipAct
+  { coActId :: ActId
+  } deriving (Eq, Show)
+
+-- | 공유물 처분 판단에 필요한 사실관계
+-- (demonstrates universal quantification: ∀ owner ∈ owners, owner ∈ consented)
+data CoOwnershipFacts = CoOwnershipFacts
+  { cofOwners    :: [PersonId]       -- 공유자 전원
+  , cofConsented :: Set PersonId     -- 동의한 공유자
+  } deriving (Eq, Show)
+
 -- Layer tokens for agency
 data Ratification    -- 추인 (§130, §132)
 data ApparentAuth    -- 표현대리 (§125-129)
@@ -143,3 +157,4 @@ type instance Facts AuthAgencyAct    = Set CivilFact
 type instance Facts UnauthAgencyAct  = Set CivilFact
 type instance Facts PossessionAct    = Set CivilFact
 type instance Facts PrescriptionAct  = PrescriptionFacts
+type instance Facts CoOwnershipAct   = CoOwnershipFacts

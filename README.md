@@ -45,6 +45,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Persons          -- §5 미성년자의 법률행위
   Deontic.Civil.Acts             -- §103-104, §107-110 법률행위
   Deontic.Civil.Agency           -- §114-132 대리
+  Deontic.Civil.CoOwnership      -- §264 공유물의 처분 (universal quantification)
   Deontic.Civil.Possession       -- §197, §200 점유 추정 (rebuttable presumptions)
   Deontic.Civil.Prescription     -- §162, §168, §174 소멸시효 (temporal reasoning)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
@@ -68,6 +69,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §200 소유의사 추정 | `PossessionAct` | (same stack) | Presumed ownership intent; rebutted by contrary evidence |
 | §162 소멸시효 | `PrescriptionAct` | `'[Interruption, Expiration]` | Claim expires after statutory period; interruption resets clock |
 | §174 시효중단 효력 | `PrescriptionAct` | (same stack) | Interrupted prescription restarts from interruption point |
+| §264 공유물의 처분 | `CoOwnershipAct` | `'[Base]` | Universal quantification: all co-owners must consent |
 
 ## Example
 

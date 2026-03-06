@@ -11,6 +11,7 @@ library
     Deontic.Civil.Persons
     Deontic.Civil.Acts
     Deontic.Civil.Agency
+    Deontic.Civil.CoOwnership
     Deontic.Civil.Possession
     Deontic.Civil.Prescription
     Deontic.Civil.Render
@@ -69,6 +70,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.ActsSpec
     Deontic.Civil.AgencySpec
     Deontic.Civil.CaseSpec
+    Deontic.Civil.CoOwnershipSpec
     Deontic.Civil.PossessionSpec
     Deontic.Civil.PrescriptionSpec
     Deontic.Civil.RenderSpec

@@ -9,13 +9,14 @@ import System.IO (hFlush, stdout, hSetEncoding, utf8)
 import System.IO.Error (isEOFError)
 
 import Deontic.Core.Types (PersonId(..), ActId(..))
-import Deontic.Core.Verdict (verdictMeet, Verdict(..))
+import Deontic.Core.Verdict (Verdict(..))
 import Deontic.Core.Adjudicate (query)
 import Deontic.Render (Renderer(..))
 import Deontic.Civil.Types
 import Deontic.Civil.Persons ()
 import Deontic.Civil.Acts ()
 import Deontic.Civil.Agency ()
+import Deontic.Civil.CoOwnership ()
 import Deontic.Civil.Possession ()
 import Deontic.Civil.Prescription ()
 import Deontic.Civil.Render (KoreanRenderer(..))
@@ -41,6 +42,7 @@ repl = do
   TIO.putStrLn "  7) 무권대리 (§125-132)"
   TIO.putStrLn "  8) 점유 추정 (§197, §200)"
   TIO.putStrLn "  9) 소멸시효 (§162, §168, §174)"
+  TIO.putStrLn "  10) 공유물의 처분 (§264)"
   TIO.putStrLn "  q) 종료"
   TIO.putStr "> "
   hFlush stdout
@@ -58,6 +60,7 @@ repl = do
     Just "7" -> handleUnauthAgency >> repl
     Just "8" -> handlePossession >> repl
     Just "9" -> handlePrescription >> repl
+    Just "10" -> handleCoOwnership >> repl
     Just _   -> TIO.putStrLn "잘못된 입력입니다.\n" >> repl
 
 askFacts :: [(String, CivilFact)] -> IO (Set.Set CivilFact)
@@ -208,5 +211,26 @@ handlePrescription = do
         , pfInterruptedAfter = intAfter
         }
       j = query (PrescriptionAct creditor claimId) facts
+  TIO.putStrLn ""
+  TIO.putStrLn (renderJudgment KoreanRenderer j)
+
+handleCoOwnership :: IO ()
+handleCoOwnership = do
+  let actId = ActId "토지처분"
+  TIO.putStr "\n공유자 수: "
+  hFlush stdout
+  n <- readLn :: IO Int
+  let owners = [PersonId (T.pack ("공유자" ++ show i)) | i <- [1..n]]
+  TIO.putStrLn "동의한 공유자 번호를 쉼표로 구분 (없으면 Enter):"
+  mapM_ (\(i, PersonId name) ->
+    TIO.putStrLn ("  " <> T.pack (show i) <> ") " <> name))
+    (zip [1::Int ..] owners)
+  TIO.putStr "> "
+  hFlush stdout
+  input <- getLine
+  let indices = parseIndices input
+      consented = Set.fromList [o | (i, o) <- zip [1..] owners, i `elem` indices]
+      facts = CoOwnershipFacts { cofOwners = owners, cofConsented = consented }
+      j = query (CoOwnershipAct actId) facts
   TIO.putStrLn ""
   TIO.putStrLn (renderJudgment KoreanRenderer j)
