@@ -44,6 +44,7 @@ test-suite deontic-core-test
     Deontic.Core.JudgmentSpec
     Deontic.Core.CapacitySpec
     Deontic.Defeasible.RuleSpec
+    Deontic.Defeasible.ResolveSpec
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
