@@ -10,6 +10,7 @@ library
     Deontic.Civil.Types
     Deontic.Civil.Persons
     Deontic.Civil.Acts
+    Deontic.Civil.Agency
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
@@ -64,6 +65,7 @@ test-suite deontic-kr-civil-test
   other-modules:
     Deontic.Civil.PersonsSpec
     Deontic.Civil.ActsSpec
+    Deontic.Civil.AgencySpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover

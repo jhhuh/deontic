@@ -39,6 +39,7 @@ verdictText :: Verdict -> Text
 verdictText Valid    = "본 법률행위는 유효하다."
 verdictText Void     = "본 법률행위는 무효이다."
 verdictText Voidable = "본 법률행위는 취소할 수 있다."
+verdictText Pending  = "본 법률행위의 효력은 미정이다."
 
 articleRefText :: ArticleRef -> Text
 articleRefText ref =

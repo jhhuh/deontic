@@ -4,7 +4,10 @@ module Deontic.Civil.Types
   , ShamAct(..)
   , MistakeAct(..)
   , FraudAct(..)
+  , AuthAgencyAct(..)
+  , UnauthAgencyAct(..)
   , CivilFact(..)
+  , Ratification, ApparentAuth
   ) where
 
 import Data.Set (Set)
@@ -40,6 +43,24 @@ data FraudAct = FraudAct
   , faActId :: ActId
   } deriving (Eq, Show)
 
+-- | 유권대리 (민법 제114조, 제118조)
+data AuthAgencyAct = AuthAgencyAct
+  { aaaPrincipal :: PersonId  -- 본인
+  , aaaAgent     :: PersonId  -- 대리인
+  , aaaActId     :: ActId
+  } deriving (Eq, Show)
+
+-- | 무권대리 (민법 제130조, 제125-129조, 제132조)
+data UnauthAgencyAct = UnauthAgencyAct
+  { uaaPrincipal :: PersonId  -- 본인
+  , uaaAgent     :: PersonId  -- 대리인
+  , uaaActId     :: ActId
+  } deriving (Eq, Show)
+
+-- Layer tokens for agency
+data Ratification    -- 추인 (§130, §132)
+data ApparentAuth    -- 표현대리 (§125-129)
+
 -- | 민법 사실관계 (Korean Civil Act facts)
 data CivilFact
   -- 인적 사항
@@ -65,10 +86,20 @@ data CivilFact
   -- §110
   | ThirdPartyFraud
   | CounterpartyKnewFraud
+  -- §118 대리
+  | SelfDealing
+  -- §125-129 표현대리
+  | IndicatedAuthority        -- §125 대리권수여의 표시
+  | ExceededScope              -- §126 권한을 넘은 행위
+  | AuthorityExpired           -- §129 대리권 소멸
+  -- §130, §132 무권대리
+  | Ratified                   -- 추인
   deriving (Eq, Ord, Show)
 
 type instance Facts MinorAct    = Set CivilFact
 type instance Facts JuristicAct = Set CivilFact
 type instance Facts ShamAct     = Set CivilFact
 type instance Facts MistakeAct  = Set CivilFact
-type instance Facts FraudAct    = Set CivilFact
+type instance Facts FraudAct         = Set CivilFact
+type instance Facts AuthAgencyAct    = Set CivilFact
+type instance Facts UnauthAgencyAct  = Set CivilFact
