@@ -11,6 +11,7 @@ library
     Deontic.Civil.Persons
     Deontic.Civil.Things
     Deontic.Civil.Acts
+    Deontic.Civil.Render
   hs-source-dirs:   src
   build-depends:
     base       >= 4.17 && < 5,
@@ -33,13 +34,15 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.PersonsSpec
     Deontic.Civil.ActsSpec
     Deontic.Civil.IntegrationSpec
+    Deontic.Civil.RenderSpec
   hs-source-dirs:   test
   build-depends:
     base       >= 4.17 && < 5,
     deontic-kr-civil,
     deontic-core,
     containers >= 0.6,
-    hspec      >= 2.0
+    hspec      >= 2.0,
+    text       >= 2.0
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021

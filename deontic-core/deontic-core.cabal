@@ -14,6 +14,7 @@ library
     Deontic.Defeasible.Defeat
     Deontic.Defeasible.Resolve
     Deontic.Query
+    Deontic.Render
   hs-source-dirs:   src
   build-depends:
     base       >= 4.17 && < 5,
