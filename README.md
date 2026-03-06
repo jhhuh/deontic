@@ -44,6 +44,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Types            -- Act types + CivilFact ADT (type-safe facts)
   Deontic.Civil.Persons          -- §5 미성년자의 법률행위
   Deontic.Civil.Acts             -- §103-104, §107-110 법률행위
+  Deontic.Civil.Agency           -- §114-132 대리
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -58,6 +59,9 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §108 통정허위표시 | `ShamAct` | `'[Proviso, Base]` | Sham → Void; bona fide third party protected |
 | §109 착오 | `MistakeAct` | `'[Proviso, Base]` | Mistake → Voidable; not if gross negligence |
 | §110 사기·강박 | `FraudAct` | `'[Proviso, Base]` | Fraud/duress → Voidable; third-party fraud rules |
+| §114 유권대리 | `AuthAgencyAct` | `'[Proviso, Base]` | Authorized agency → Valid; self-dealing → Voidable |
+| §125-129 표현대리 | `UnauthAgencyAct` | `'[ApparentAuth, Ratification, Base]` | Apparent authority → Valid |
+| §130 무권대리 | `UnauthAgencyAct` | (same stack) | Unauthorized → Pending; ratification → Valid |
 
 ## Example
 
