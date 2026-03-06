@@ -9,7 +9,7 @@ import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
 import Deontic.Render (Renderer(..))
-import Deontic.Civil.Types (MinorAct(..), JuristicAct(..))
+import Deontic.Civil.Types (MinorAct(..), JuristicAct(..), CivilFact(..))
 import Deontic.Civil.Persons ()
 import Deontic.Civil.Acts ()
 import Deontic.Civil.Render (KoreanRenderer(..))
@@ -32,7 +32,7 @@ spec = do
       let person = PersonId "이영희"
           act1 = ActId "계약"
           j = query (JuristicAct person act1)
-                (Set.fromList [Custom "hidden-intention", Custom "counterparty-knew"])
+                (Set.fromList [HiddenIntention, CounterpartyKnew])
           rendered = renderJudgment renderer j
       rendered `shouldSatisfy` T.isInfixOf "무효"
       rendered `shouldSatisfy` T.isInfixOf "민법 제107조"
@@ -41,7 +41,7 @@ spec = do
       let person = PersonId "박민수"
           act1 = ActId "도박계약"
           j = query (JuristicAct person act1)
-                (Set.fromList [Custom "contra-bonos-mores"])
+                (Set.fromList [ContraBonorsMores])
           rendered = renderJudgment renderer j
       rendered `shouldSatisfy` T.isInfixOf "무효"
       rendered `shouldSatisfy` T.isInfixOf "민법 제103조"

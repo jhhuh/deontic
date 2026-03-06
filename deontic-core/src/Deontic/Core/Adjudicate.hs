@@ -32,7 +32,7 @@ verdict (JDelegate prev)     = verdict prev
 
 -- | Core typeclass: stratified adjudication
 class Adjudicate act (layers :: [Type]) where
-  adjudicate :: act -> Facts -> Judgment layers
+  adjudicate :: act -> Facts act -> Judgment layers
 
 -- | Non-resolution: empty layer stack is a type error (법의 흠결)
 instance TypeError
@@ -42,5 +42,5 @@ instance TypeError
   adjudicate = error "unreachable"
 
 -- | Top-level query using Resolvable to determine the layer stack
-query :: forall act. Adjudicate act (Resolvable act) => act -> Facts -> Judgment (Resolvable act)
+query :: forall act. Adjudicate act (Resolvable act) => act -> Facts act -> Judgment (Resolvable act)
 query act facts = adjudicate act facts

@@ -1,12 +1,11 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Deontic.Core.Types
   ( PersonId(..), ActId(..), ThingId(..)
   , ArticleRef(..)
-  , Fact(..), Facts
+  , Facts
   ) where
 
+import Data.Kind (Type)
 import Data.Text (Text)
-import Data.Set (Set)
 
 newtype PersonId = PersonId Text deriving (Eq, Ord, Show)
 newtype ActId    = ActId Text    deriving (Eq, Ord, Show)
@@ -18,15 +17,5 @@ data ArticleRef = ArticleRef
   , articleParagraph :: Maybe Int
   } deriving (Eq, Ord, Show)
 
-data Fact
-  = IsNaturalPerson PersonId
-  | IsJuristicPerson PersonId
-  | IsMinor PersonId
-  | IsAdult PersonId
-  | HasGuardian PersonId PersonId
-  | HasConsent PersonId ActId
-  | PerformsAct PersonId ActId
-  | Custom Text
-  deriving (Eq, Ord, Show)
-
-type Facts = Set Fact
+-- | Open type family: each jurisdiction defines its own fact type
+type family Facts act :: Type

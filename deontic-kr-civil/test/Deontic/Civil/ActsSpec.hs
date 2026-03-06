@@ -5,7 +5,7 @@ import qualified Data.Set as Set
 import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
-import Deontic.Civil.Types (JuristicAct(..), ShamAct(..), MistakeAct(..), FraudAct(..))
+import Deontic.Civil.Types (JuristicAct(..), ShamAct(..), MistakeAct(..), FraudAct(..), CivilFact(..))
 import Deontic.Civil.Acts ()
 
 spec :: Spec
@@ -16,22 +16,22 @@ spec = do
 
     it "§103: 반사회질서의 법률행위는 무효" $ do
       let j = query (JuristicAct person act1)
-                (Set.fromList [Custom "contra-bonos-mores"])
+                (Set.fromList [ContraBonorsMores])
       verdict j `shouldBe` Void
 
     it "§104: 불공정한 법률행위는 무효" $ do
       let j = query (JuristicAct person act1)
-                (Set.fromList [Custom "exploitative-act"])
+                (Set.fromList [ExploitativeAct])
       verdict j `shouldBe` Void
 
     it "§107①: 비진의 의사표시는 유효" $ do
       let j = query (JuristicAct person act1)
-                (Set.fromList [Custom "hidden-intention"])
+                (Set.fromList [HiddenIntention])
       verdict j `shouldBe` Valid
 
     it "§107②: 상대방이 안 경우 무효" $ do
       let j = query (JuristicAct person act1)
-                (Set.fromList [Custom "hidden-intention", Custom "counterparty-knew"])
+                (Set.fromList [HiddenIntention, CounterpartyKnew])
       verdict j `shouldBe` Void
 
   describe "민법 제108조 — 통정허위표시" $ do
@@ -44,7 +44,7 @@ spec = do
 
     it "§108②: 선의의 제3자에게는 대항 불가 (유효)" $ do
       let j = query (ShamAct person act1)
-                (Set.singleton (Custom "bona-fide-third-party"))
+                (Set.singleton BonaFideThirdParty)
       verdict j `shouldBe` Valid
 
   describe "민법 제109조 — 착오로 인한 의사표시" $ do
@@ -57,7 +57,7 @@ spec = do
 
     it "§109① 단서: 중과실이면 취소 불가 (유효)" $ do
       let j = query (MistakeAct person act1)
-                (Set.singleton (Custom "gross-negligence"))
+                (Set.singleton GrossNegligence)
       verdict j `shouldBe` Valid
 
   describe "민법 제110조 — 사기·강박에 의한 의사표시" $ do
@@ -70,12 +70,12 @@ spec = do
 
     it "§110②: 제3자 사기, 상대방 악의 → 취소 가능" $ do
       let j = query (FraudAct person act1)
-                (Set.fromList [Custom "third-party-fraud", Custom "counterparty-knew-fraud"])
+                (Set.fromList [ThirdPartyFraud, CounterpartyKnewFraud])
       verdict j `shouldBe` Voidable
 
     it "§110②: 제3자 사기, 상대방 선의 → 취소 불가 (유효)" $ do
       let j = query (FraudAct person act1)
-                (Set.singleton (Custom "third-party-fraud"))
+                (Set.singleton ThirdPartyFraud)
       verdict j `shouldBe` Valid
 
   describe "verdictMeet — 독립된 판단 결합" $ do

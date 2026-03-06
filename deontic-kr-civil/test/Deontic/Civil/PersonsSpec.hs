@@ -6,7 +6,7 @@ import qualified Data.Set as Set
 import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
-import Deontic.Civil.Types (MinorAct(..))
+import Deontic.Civil.Types (MinorAct(..), CivilFact(..))
 import Deontic.Civil.Persons ()
 
 spec :: Spec
@@ -25,7 +25,7 @@ spec = do
       let j = query (MinorAct minor act1)
                 (Set.fromList [ IsMinor minor
                               , PerformsAct minor act1
-                              , Custom "merely-acquires-right"
+                              , MerelyAcquiresRight
                               ])
       verdict j `shouldBe` Valid
 

@@ -5,14 +5,14 @@ import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Layer
 import Deontic.Core.Adjudicate
-import Deontic.Civil.Types (JuristicAct(..), ShamAct(..), MistakeAct(..), FraudAct(..))
+import Deontic.Civil.Types (JuristicAct(..), ShamAct(..), MistakeAct(..), FraudAct(..), CivilFact(..))
 
 type instance Resolvable JuristicAct = '[SpecialRule, Proviso, Base]
 
 -- 제107조(비진의 의사표시) — Base layer
 instance Adjudicate JuristicAct '[Base] where
   adjudicate _ facts
-    | Custom "hidden-intention" `Set.member` facts =
+    | HiddenIntention `Set.member` facts =
         JBase Valid
           (ArticleRef "민법" 107 (Just 1))
           "의사표시는 표의자가 진의아님을 알고 한 것이라도 그 효력에 영향을 미치지 아니한다."
@@ -25,8 +25,8 @@ instance Adjudicate JuristicAct '[Base] where
 instance Adjudicate JuristicAct rest
       => Adjudicate JuristicAct (Proviso ': rest) where
   adjudicate act facts
-    | Custom "hidden-intention" `Set.member` facts
-      && Custom "counterparty-knew" `Set.member` facts =
+    | HiddenIntention `Set.member` facts
+      && CounterpartyKnew `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 107 (Just 2))
@@ -38,12 +38,12 @@ instance Adjudicate JuristicAct rest
 instance Adjudicate JuristicAct rest
       => Adjudicate JuristicAct (SpecialRule ': rest) where
   adjudicate act facts
-    | Custom "contra-bonos-mores" `Set.member` facts =
+    | ContraBonorsMores `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 103 Nothing)
                   "선량한 풍속 기타 사회질서에 위반한 사항을 내용으로 하는 법률행위는 무효로 한다."
-    | Custom "exploitative-act" `Set.member` facts =
+    | ExploitativeAct `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Void
                   (ArticleRef "민법" 104 Nothing)
@@ -68,7 +68,7 @@ instance Adjudicate ShamAct '[Base] where
 instance Adjudicate ShamAct rest
       => Adjudicate ShamAct (Proviso ': rest) where
   adjudicate act facts
-    | Custom "bona-fide-third-party" `Set.member` facts =
+    | BonaFideThirdParty `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "민법" 108 (Just 2))
@@ -95,7 +95,7 @@ instance Adjudicate MistakeAct '[Base] where
 instance Adjudicate MistakeAct rest
       => Adjudicate MistakeAct (Proviso ': rest) where
   adjudicate act facts
-    | Custom "gross-negligence" `Set.member` facts =
+    | GrossNegligence `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "민법" 109 (Just 1))
@@ -123,8 +123,8 @@ instance Adjudicate FraudAct '[Base] where
 instance Adjudicate FraudAct rest
       => Adjudicate FraudAct (Proviso ': rest) where
   adjudicate act facts
-    | Custom "third-party-fraud" `Set.member` facts
-      && not (Custom "counterparty-knew-fraud" `Set.member` facts) =
+    | ThirdPartyFraud `Set.member` facts
+      && not (CounterpartyKnewFraud `Set.member` facts) =
         JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "민법" 110 (Just 2))

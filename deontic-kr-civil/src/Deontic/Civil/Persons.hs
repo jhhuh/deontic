@@ -6,7 +6,7 @@ import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Layer
 import Deontic.Core.Adjudicate
-import Deontic.Civil.Types (MinorAct(..))
+import Deontic.Civil.Types (MinorAct(..), CivilFact(..))
 
 type instance Resolvable MinorAct = '[Proviso, Base]
 
@@ -28,7 +28,7 @@ instance Adjudicate MinorAct '[Base] where
 instance Adjudicate MinorAct rest
       => Adjudicate MinorAct (Proviso ': rest) where
   adjudicate act facts
-    | Custom "merely-acquires-right" `Set.member` facts =
+    | MerelyAcquiresRight `Set.member` facts =
         JOverride (adjudicate @_ @rest act facts)
                   Valid
                   (ArticleRef "민법" 5 (Just 1))
@@ -36,6 +36,6 @@ instance Adjudicate MinorAct rest
     | otherwise =
         JDelegate (adjudicate @_ @rest act facts)
 
-hasConsent :: ActId -> Facts -> Bool
+hasConsent :: ActId -> Set.Set CivilFact -> Bool
 hasConsent actId facts =
   any (\case HasConsent _ a -> a == actId; _ -> False) (Set.toList facts)

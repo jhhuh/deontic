@@ -4,9 +4,11 @@ module Deontic.Civil.Types
   , ShamAct(..)
   , MistakeAct(..)
   , FraudAct(..)
+  , CivilFact(..)
   ) where
 
-import Deontic.Core.Types (PersonId, ActId)
+import Data.Set (Set)
+import Deontic.Core.Types (PersonId, ActId, Facts)
 
 -- | 미성년자의 법률행위 (민법 제5조)
 data MinorAct = MinorAct
@@ -37,3 +39,36 @@ data FraudAct = FraudAct
   { faActor :: PersonId
   , faActId :: ActId
   } deriving (Eq, Show)
+
+-- | 민법 사실관계 (Korean Civil Act facts)
+data CivilFact
+  -- 인적 사항
+  = IsNaturalPerson PersonId
+  | IsJuristicPerson PersonId
+  | IsMinor PersonId
+  | IsAdult PersonId
+  | HasGuardian PersonId PersonId
+  | HasConsent PersonId ActId
+  | PerformsAct PersonId ActId
+  -- §5 단서
+  | MerelyAcquiresRight
+  -- §103, §104
+  | ContraBonorsMores
+  | ExploitativeAct
+  -- §107
+  | HiddenIntention
+  | CounterpartyKnew
+  -- §108
+  | BonaFideThirdParty
+  -- §109
+  | GrossNegligence
+  -- §110
+  | ThirdPartyFraud
+  | CounterpartyKnewFraud
+  deriving (Eq, Ord, Show)
+
+type instance Facts MinorAct    = Set CivilFact
+type instance Facts JuristicAct = Set CivilFact
+type instance Facts ShamAct     = Set CivilFact
+type instance Facts MistakeAct  = Set CivilFact
+type instance Facts FraudAct    = Set CivilFact
