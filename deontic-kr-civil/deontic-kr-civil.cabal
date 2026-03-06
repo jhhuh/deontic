@@ -32,6 +32,7 @@ test-suite deontic-kr-civil-test
   other-modules:
     Deontic.Civil.PersonsSpec
     Deontic.Civil.ActsSpec
+    Deontic.Civil.IntegrationSpec
   hs-source-dirs:   test
   build-depends:
     base       >= 4.17 && < 5,
