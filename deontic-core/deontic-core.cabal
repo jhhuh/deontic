@@ -41,6 +41,7 @@ test-suite deontic-core-test
   other-modules:
     Deontic.Core.TypesSpec
     Deontic.Core.JudgmentSpec
+    Deontic.Core.CapacitySpec
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
