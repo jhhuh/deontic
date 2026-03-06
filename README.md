@@ -40,6 +40,10 @@ deontic-core/                    -- Framework (jurisdiction-agnostic)
   Deontic.Core.Adjudicate        -- Adjudicate typeclass, Judgment GADT, query
   Deontic.Render                 -- Step extraction, Renderer typeclass
 
+deontic-de-bgb/                  -- German Civil Code (BGB) fragment
+  Deontic.BGB.Types              -- CapacityAct, BGBFact
+  Deontic.BGB.Capacity           -- §104-§113 Geschäftsfähigkeit
+
 deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.Types            -- Act types + CivilFact ADT (type-safe facts)
   Deontic.Civil.Persons          -- §5 미성년자의 법률행위
@@ -73,6 +77,11 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §264 공유물의 처분 | `CoOwnershipAct` | `'[Base]` | Universal quantification: all co-owners must consent |
 | §750 불법행위 | `TortAct` | `'[ContributoryNeg, Base]` | All 4 elements required; contributory negligence reduces |
 | §396 과실상계 | `TortAct` | (same stack) | Victim negligence reduces liability (Void → Voidable) |
+| **BGB (German)** | | | |
+| §104 Geschäftsunfähigkeit | `CapacityAct` | `'[SpecialRule, Proviso, Base]` | Under 7 or permanently incapable → Void |
+| §106 beschränkte Geschäftsfähigkeit | `CapacityAct` | (same stack) | Minor without consent → Voidable |
+| §107 rechtlicher Vorteil | `CapacityAct` | (same stack) | Purely beneficial → Valid (proviso) |
+| §110 Taschengeld | `CapacityAct` | (same stack) | Pocket money → Valid (special rule) |
 
 ## Example
 

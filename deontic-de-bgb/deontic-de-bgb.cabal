@@ -1,0 +1,55 @@
+cabal-version: 3.0
+name:          deontic-de-bgb
+version:       0.1.0.0
+synopsis:      German Civil Code (BGB) fragment with type-level stratified deontic logic
+license:       AGPL-3.0-or-later
+license-file:  LICENSE
+
+library
+  exposed-modules:
+    Deontic.BGB.Types
+    Deontic.BGB.Capacity
+  hs-source-dirs: src
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-core,
+    containers >= 0.6,
+    text       >= 2.0
+  default-language: GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    TypeApplications
+    MultiParamTypeClasses
+    FlexibleContexts
+    FlexibleInstances
+    ScopedTypeVariables
+    UndecidableInstances
+    OverloadedStrings
+
+test-suite deontic-de-bgb-test
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-de-bgb,
+    deontic-core,
+    containers >= 0.6,
+    text       >= 2.0,
+    hspec      >= 2.0
+  other-modules:
+    Deontic.BGB.CapacitySpec
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  default-language: GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    TypeApplications
+    FlexibleContexts
+    FlexibleInstances
+    ScopedTypeVariables
+    OverloadedStrings
