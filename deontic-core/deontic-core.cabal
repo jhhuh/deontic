@@ -1,0 +1,42 @@
+cabal-version: 3.0
+name:          deontic-core
+version:       0.1.0.0
+synopsis:      Core deontic logic framework with defeasible reasoning
+license:       AGPL-3.0-or-later
+license-file:  LICENSE
+
+library
+  exposed-modules:
+    Deontic.Core.Types
+    Deontic.Core.Judgment
+    Deontic.Core.Capacity
+    Deontic.Defeasible.Rule
+    Deontic.Defeasible.Defeat
+    Deontic.Defeasible.Resolve
+    Deontic.Query
+  hs-source-dirs:   src
+  build-depends:
+    base       >= 4.17 && < 5,
+    containers >= 0.6,
+    text       >= 2.0
+  default-language:    GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    MultiParamTypeClasses
+    FlexibleContexts
+    FlexibleInstances
+    StandaloneKindSignatures
+
+test-suite deontic-core-test
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-core,
+    hspec      >= 2.0
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  default-language: GHC2021

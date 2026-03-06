@@ -1,0 +1,39 @@
+cabal-version: 3.0
+name:          deontic-kr-civil
+version:       0.1.0.0
+synopsis:      Korean Civil Code knowledge representation using deontic-core
+license:       AGPL-3.0-or-later
+license-file:  LICENSE
+
+library
+  exposed-modules:
+    Deontic.Civil.General
+    Deontic.Civil.Persons
+    Deontic.Civil.Things
+    Deontic.Civil.Acts
+  hs-source-dirs:   src
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-core,
+    containers >= 0.6,
+    text       >= 2.0
+  default-language:    GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    MultiParamTypeClasses
+    FlexibleContexts
+    FlexibleInstances
+
+test-suite deontic-kr-civil-test
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-kr-civil,
+    hspec      >= 2.0
+  build-tool-depends:
+    hspec-discover:hspec-discover
+  default-language: GHC2021
