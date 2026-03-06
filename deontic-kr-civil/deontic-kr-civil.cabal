@@ -1,50 +1,59 @@
 cabal-version: 3.0
 name:          deontic-kr-civil
-version:       0.1.0.0
-synopsis:      Korean Civil Code knowledge representation using deontic-core
+version:       0.2.0.0
+synopsis:      Korean Civil Act (민법) with type-level stratified deontic logic
 license:       AGPL-3.0-or-later
 license-file:  LICENSE
 
 library
   exposed-modules:
-    Deontic.Civil.General
+    Deontic.Civil.Types
     Deontic.Civil.Persons
-    Deontic.Civil.Things
     Deontic.Civil.Acts
     Deontic.Civil.Render
-  hs-source-dirs:   src
+  hs-source-dirs: src
   build-depends:
     base       >= 4.17 && < 5,
     deontic-core,
     containers >= 0.6,
     text       >= 2.0
-  default-language:    GHC2021
+  default-language: GHC2021
   default-extensions:
     GADTs
     DataKinds
     TypeFamilies
+    TypeApplications
     MultiParamTypeClasses
     FlexibleContexts
     FlexibleInstances
+    ScopedTypeVariables
+    UndecidableInstances
+    OverloadedStrings
 
 test-suite deontic-kr-civil-test
   type:             exitcode-stdio-1.0
   main-is:          Spec.hs
-  other-modules:
-    Deontic.Civil.PersonsSpec
-    Deontic.Civil.ActsSpec
-    Deontic.Civil.IntegrationSpec
-    Deontic.Civil.RenderSpec
   hs-source-dirs:   test
   build-depends:
     base       >= 4.17 && < 5,
     deontic-kr-civil,
     deontic-core,
     containers >= 0.6,
-    hspec      >= 2.0,
-    text       >= 2.0
+    text       >= 2.0,
+    hspec      >= 2.0
+  other-modules:
+    Deontic.Civil.PersonsSpec
+    Deontic.Civil.ActsSpec
+    Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
   default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    TypeApplications
+    FlexibleContexts
+    FlexibleInstances
+    ScopedTypeVariables
     OverloadedStrings

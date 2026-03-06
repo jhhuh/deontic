@@ -1,26 +1,23 @@
 cabal-version: 3.0
 name:          deontic-core
-version:       0.1.0.0
-synopsis:      Core deontic logic framework with defeasible reasoning
+version:       0.2.0.0
+synopsis:      Type-level stratified deontic logic framework
 license:       AGPL-3.0-or-later
 license-file:  LICENSE
 
 library
   exposed-modules:
     Deontic.Core.Types
-    Deontic.Core.Judgment
-    Deontic.Core.Capacity
-    Deontic.Defeasible.Rule
-    Deontic.Defeasible.Defeat
-    Deontic.Defeasible.Resolve
-    Deontic.Query
+    Deontic.Core.Verdict
+    Deontic.Core.Layer
+    Deontic.Core.Adjudicate
     Deontic.Render
-  hs-source-dirs:   src
+  hs-source-dirs: src
   build-depends:
     base       >= 4.17 && < 5,
     containers >= 0.6,
     text       >= 2.0
-  default-language:    GHC2021
+  default-language: GHC2021
   default-extensions:
     GADTs
     DataKinds
@@ -28,7 +25,12 @@ library
     MultiParamTypeClasses
     FlexibleContexts
     FlexibleInstances
+    ScopedTypeVariables
+    TypeApplications
+    UndecidableInstances
     StandaloneKindSignatures
+    PolyKinds
+    AllowAmbiguousTypes
 
 test-suite deontic-core-test
   type:             exitcode-stdio-1.0
@@ -42,11 +44,16 @@ test-suite deontic-core-test
     containers >= 0.6
   other-modules:
     Deontic.Core.TypesSpec
-    Deontic.Core.JudgmentSpec
-    Deontic.Core.CapacitySpec
-    Deontic.Defeasible.RuleSpec
-    Deontic.Defeasible.ResolveSpec
-    Deontic.QuerySpec
+    Deontic.Core.AdjudicateSpec
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    TypeApplications
+    FlexibleContexts
+    FlexibleInstances
+    ScopedTypeVariables
+    OverloadedStrings
