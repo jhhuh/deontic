@@ -29,11 +29,17 @@ library
 test-suite deontic-kr-civil-test
   type:             exitcode-stdio-1.0
   main-is:          Spec.hs
+  other-modules:
+    Deontic.Civil.PersonsSpec
   hs-source-dirs:   test
   build-depends:
     base       >= 4.17 && < 5,
     deontic-kr-civil,
+    deontic-core,
+    containers >= 0.6,
     hspec      >= 2.0
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
+  default-extensions:
+    OverloadedStrings
