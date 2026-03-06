@@ -122,6 +122,18 @@ instance Adjudicate CoOwnershipAct '[Base] where
 
 The key insight: quantification doesn't need a new framework feature. The `Facts` type family + Haskell's own computation (`all`, `any`, `length`, arithmetic) handles boolean, temporal, and quantified conditions uniformly. The framework provides the *defeasibility structure*; the *domain logic* lives in the instance body.
 
+## Formal Verification Sketch (Agda)
+
+The core Judgment GADT and verdict algebra have been ported to Agda (`agda-sketch/Deontic.agda`). The key results:
+
+1. **Verdict extraction is total.** The `verdict` function type-checks in Agda without absurd patterns or postulates, which constitutes a machine-checked proof of totality. The empty list case `'[]` is impossible by construction — all three GADT constructors require at least one layer.
+
+2. **Verdict meet properties are proven.** Commutativity, identity (`Valid ⊓ a ≡ a`), and absorption (`Void ⊓ a ≡ Void`) are proven by exhaustive case analysis (4×4 = 16 cases for commutativity).
+
+3. **The Judgment GADT ports directly.** The Agda encoding is structurally identical to the Haskell one — `JBase`, `JOverride`, `JDelegate` with the same type indices. This validates the claim that the Haskell encoding is a faithful Curry-Howard representation.
+
+What the sketch does NOT prove: faithfulness of the encoding to a formal deontic logic semantics. That would require first formalizing the semantics, which is future work.
+
 ## Open Questions
 
-1. **Formal verification.** Can this encoding be ported to a dependently-typed language (Agda, Idris) where the soundness argument itself becomes a theorem?
+1. **Formal deontic semantics.** The Agda sketch proves structural properties (totality, algebra). A deeper formalization would define a denotational semantics for stratified defeasible deontic logic and prove that the Judgment GADT is a sound and complete representation.

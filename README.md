@@ -40,6 +40,9 @@ deontic-core/                    -- Framework (jurisdiction-agnostic)
   Deontic.Core.Adjudicate        -- Adjudicate typeclass, Judgment GADT, query
   Deontic.Render                 -- Step extraction, Renderer typeclass
 
+agda-sketch/                     -- Formal verification sketch (Agda)
+  Deontic.agda                   -- Totality proof, verdict algebra proofs
+
 deontic-de-bgb/                  -- German Civil Code (BGB) fragment
   Deontic.BGB.Types              -- CapacityAct, BGBFact
   Deontic.BGB.Capacity           -- §104-§113 Geschäftsfähigkeit
