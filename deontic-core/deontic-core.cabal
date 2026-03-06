@@ -36,9 +36,11 @@ test-suite deontic-core-test
   build-depends:
     base       >= 4.17 && < 5,
     deontic-core,
-    hspec      >= 2.0
+    hspec      >= 2.0,
+    text       >= 2.0
   other-modules:
     Deontic.Core.TypesSpec
+    Deontic.Core.JudgmentSpec
   build-tool-depends:
     hspec-discover:hspec-discover
   default-language: GHC2021
