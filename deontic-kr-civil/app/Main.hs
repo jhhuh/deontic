@@ -19,6 +19,7 @@ import Deontic.Civil.Agency ()
 import Deontic.Civil.CoOwnership ()
 import Deontic.Civil.Possession ()
 import Deontic.Civil.Prescription ()
+import Deontic.Civil.Tort ()
 import Deontic.Civil.Render (KoreanRenderer(..))
 
 main :: IO ()
@@ -43,6 +44,7 @@ repl = do
   TIO.putStrLn "  8) 점유 추정 (§197, §200)"
   TIO.putStrLn "  9) 소멸시효 (§162, §168, §174)"
   TIO.putStrLn "  10) 공유물의 처분 (§264)"
+  TIO.putStrLn "  11) 불법행위 (§750, §396)"
   TIO.putStrLn "  q) 종료"
   TIO.putStr "> "
   hFlush stdout
@@ -61,6 +63,7 @@ repl = do
     Just "8" -> handlePossession >> repl
     Just "9" -> handlePrescription >> repl
     Just "10" -> handleCoOwnership >> repl
+    Just "11" -> handleTort >> repl
     Just _   -> TIO.putStrLn "잘못된 입력입니다.\n" >> repl
 
 askFacts :: [(String, CivilFact)] -> IO (Set.Set CivilFact)
@@ -232,5 +235,26 @@ handleCoOwnership = do
       consented = Set.fromList [o | (i, o) <- zip [1..] owners, i `elem` indices]
       facts = CoOwnershipFacts { cofOwners = owners, cofConsented = consented }
       j = query (CoOwnershipAct actId) facts
+  TIO.putStrLn ""
+  TIO.putStrLn (renderJudgment KoreanRenderer j)
+
+handleTort :: IO ()
+handleTort = do
+  let victim     = PersonId "피해자"
+      tortfeasor = PersonId "가해자"
+      actId      = ActId "사고"
+  TIO.putStrLn "\n불법행위 요건 (y/n):"
+  let askYN prompt = do
+        TIO.putStr prompt
+        hFlush stdout
+        ans <- getLine
+        pure (ans == "y")
+  fault     <- askYN "  고의 또는 과실? "
+  unlawful  <- askYN "  위법성? "
+  damage    <- askYN "  손해 발생? "
+  causation <- askYN "  인과관계? "
+  victimNeg <- askYN "  피해자 과실 (과실상계)? "
+  let facts = TortFacts fault unlawful damage causation victimNeg
+      j = query (TortAct victim tortfeasor actId) facts
   TIO.putStrLn ""
   TIO.putStrLn (renderJudgment KoreanRenderer j)

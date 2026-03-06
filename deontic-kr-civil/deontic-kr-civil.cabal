@@ -14,6 +14,7 @@ library
     Deontic.Civil.CoOwnership
     Deontic.Civil.Possession
     Deontic.Civil.Prescription
+    Deontic.Civil.Tort
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
@@ -73,6 +74,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.CoOwnershipSpec
     Deontic.Civil.PossessionSpec
     Deontic.Civil.PrescriptionSpec
+    Deontic.Civil.TortSpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover

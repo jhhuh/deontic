@@ -9,12 +9,15 @@ module Deontic.Civil.Types
   , PossessionAct(..)
   , PrescriptionAct(..)
   , CoOwnershipAct(..)
+  , TortAct(..)
   , CivilFact(..)
   , PrescriptionFacts(..)
   , CoOwnershipFacts(..)
+  , TortFacts(..)
   , Ratification, ApparentAuth
   , Presumption, Rebuttal
   , Expiration, Interruption
+  , ContributoryNeg
   ) where
 
 import Data.Set (Set)
@@ -96,6 +99,22 @@ data CoOwnershipFacts = CoOwnershipFacts
   , cofConsented :: Set PersonId     -- 동의한 공유자
   } deriving (Eq, Show)
 
+-- | 불법행위 (민법 제750조, 제763조→제396조)
+data TortAct = TortAct
+  { taVictim    :: PersonId
+  , taTortfeasor :: PersonId
+  , taActId     :: ActId
+  } deriving (Eq, Show)
+
+-- | 불법행위 판단에 필요한 사실관계
+data TortFacts = TortFacts
+  { tfFault     :: Bool   -- 고의 또는 과실
+  , tfUnlawful  :: Bool   -- 위법성
+  , tfDamage    :: Bool   -- 손해 발생
+  , tfCausation :: Bool   -- 인과관계
+  , tfVictimNeg :: Bool   -- 피해자의 과실 (과실상계 §763→§396)
+  } deriving (Eq, Show)
+
 -- Layer tokens for agency
 data Ratification    -- 추인 (§130, §132)
 data ApparentAuth    -- 표현대리 (§125-129)
@@ -107,6 +126,9 @@ data Rebuttal        -- 반증 (rebuttal)
 -- Layer tokens for prescription (소멸시효)
 data Expiration      -- 시효만료 (§162)
 data Interruption    -- 시효중단 (§168, §174)
+
+-- Layer tokens for tort (불법행위)
+data ContributoryNeg -- 과실상계 (§763→§396)
 
 -- | 민법 사실관계 (Korean Civil Act facts)
 data CivilFact
@@ -158,3 +180,4 @@ type instance Facts UnauthAgencyAct  = Set CivilFact
 type instance Facts PossessionAct    = Set CivilFact
 type instance Facts PrescriptionAct  = PrescriptionFacts
 type instance Facts CoOwnershipAct   = CoOwnershipFacts
+type instance Facts TortAct          = TortFacts

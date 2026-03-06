@@ -48,6 +48,7 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.CoOwnership      -- §264 공유물의 처분 (universal quantification)
   Deontic.Civil.Possession       -- §197, §200 점유 추정 (rebuttable presumptions)
   Deontic.Civil.Prescription     -- §162, §168, §174 소멸시효 (temporal reasoning)
+  Deontic.Civil.Tort             -- §750, §396 불법행위 (multi-element + contributory neg)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -70,6 +71,8 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §162 소멸시효 | `PrescriptionAct` | `'[Interruption, Expiration]` | Claim expires after statutory period; interruption resets clock |
 | §174 시효중단 효력 | `PrescriptionAct` | (same stack) | Interrupted prescription restarts from interruption point |
 | §264 공유물의 처분 | `CoOwnershipAct` | `'[Base]` | Universal quantification: all co-owners must consent |
+| §750 불법행위 | `TortAct` | `'[ContributoryNeg, Base]` | All 4 elements required; contributory negligence reduces |
+| §396 과실상계 | `TortAct` | (same stack) | Victim negligence reduces liability (Void → Voidable) |
 
 ## Example
 
