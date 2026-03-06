@@ -18,6 +18,7 @@ spec = do
     it "returns undefeated conclusions" $ do
       let r1 = Rule
             { ruleId = art5_1
+            , sourceText = "미성년자가 법률행위를 함에는 법정대리인의 동의를 얻어야 한다."
             , precondition = \fs -> IsMinor minor `Set.member` fs
             , conclusion = JVoidable [art5_1]
             , defeatedBy = [art5_2]
@@ -30,12 +31,14 @@ spec = do
     it "defeats a rule when its defeater is applicable" $ do
       let r1 = Rule
             { ruleId = art5_1
+            , sourceText = "미성년자가 법률행위를 함에는 법정대리인의 동의를 얻어야 한다."
             , precondition = \fs -> IsMinor minor `Set.member` fs
             , conclusion = JVoidable [art5_1]
             , defeatedBy = [art5_2]
             }
           r2 = Rule
             { ruleId = art5_2
+            , sourceText = "권리만을 얻거나 의무만을 면하는 법률행위는 그러하지 아니하다."
             , precondition = \fs -> IsMinor minor `Set.member` fs
                                  && Custom "merely-acquires-right" `Set.member` fs
             , conclusion = JValid [art5_2]
@@ -49,6 +52,7 @@ spec = do
     it "returns nothing when no rules are applicable" $ do
       let r1 = Rule
             { ruleId = art5_1
+            , sourceText = "미성년자가 법률행위를 함에는 법정대리인의 동의를 얻어야 한다."
             , precondition = \fs -> IsMinor minor `Set.member` fs
             , conclusion = JVoidable [art5_1]
             , defeatedBy = []

@@ -17,6 +17,7 @@ spec = do
           code = SimpleCode
             [ Rule
                 { ruleId = art5_1
+                , sourceText = "미성년자가 법률행위를 함에는 법정대리인의 동의를 얻어야 한다."
                 , precondition = \fs -> IsMinor minor `Set.member` fs
                 , conclusion = JVoidable [art5_1]
                 , defeatedBy = []
