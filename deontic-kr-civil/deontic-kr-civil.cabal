@@ -30,6 +30,26 @@ library
     UndecidableInstances
     OverloadedStrings
 
+executable deontic-kr-civil-cli
+  main-is:          Main.hs
+  hs-source-dirs:   app
+  build-depends:
+    base       >= 4.17 && < 5,
+    deontic-core,
+    deontic-kr-civil,
+    containers >= 0.6,
+    text       >= 2.0
+  default-language: GHC2021
+  default-extensions:
+    GADTs
+    DataKinds
+    TypeFamilies
+    TypeApplications
+    FlexibleContexts
+    FlexibleInstances
+    ScopedTypeVariables
+    OverloadedStrings
+
 test-suite deontic-kr-civil-test
   type:             exitcode-stdio-1.0
   main-is:          Spec.hs
