@@ -5,7 +5,7 @@ import qualified Data.Set as Set
 import Deontic.Core.Types
 import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
-import Deontic.Civil.Types (JuristicAct(..))
+import Deontic.Civil.Types (JuristicAct(..), ShamAct(..), MistakeAct(..), FraudAct(..))
 import Deontic.Civil.Acts ()
 
 spec :: Spec
@@ -33,3 +33,55 @@ spec = do
       let j = query (JuristicAct person act1)
                 (Set.fromList [Custom "hidden-intention", Custom "counterparty-knew"])
       verdict j `shouldBe` Void
+
+  describe "민법 제108조 — 통정허위표시" $ do
+    let person = PersonId "박민수"
+        act1 = ActId "가장매매"
+
+    it "§108①: 통정허위표시는 무효" $ do
+      let j = query (ShamAct person act1) Set.empty
+      verdict j `shouldBe` Void
+
+    it "§108②: 선의의 제3자에게는 대항 불가 (유효)" $ do
+      let j = query (ShamAct person act1)
+                (Set.singleton (Custom "bona-fide-third-party"))
+      verdict j `shouldBe` Valid
+
+  describe "민법 제109조 — 착오로 인한 의사표시" $ do
+    let person = PersonId "최수진"
+        act1 = ActId "착오계약"
+
+    it "§109① 본문: 중요부분 착오 시 취소 가능" $ do
+      let j = query (MistakeAct person act1) Set.empty
+      verdict j `shouldBe` Voidable
+
+    it "§109① 단서: 중과실이면 취소 불가 (유효)" $ do
+      let j = query (MistakeAct person act1)
+                (Set.singleton (Custom "gross-negligence"))
+      verdict j `shouldBe` Valid
+
+  describe "민법 제110조 — 사기·강박에 의한 의사표시" $ do
+    let person = PersonId "정호영"
+        act1 = ActId "사기계약"
+
+    it "§110①: 사기·강박에 의한 의사표시는 취소 가능" $ do
+      let j = query (FraudAct person act1) Set.empty
+      verdict j `shouldBe` Voidable
+
+    it "§110②: 제3자 사기, 상대방 악의 → 취소 가능" $ do
+      let j = query (FraudAct person act1)
+                (Set.fromList [Custom "third-party-fraud", Custom "counterparty-knew-fraud"])
+      verdict j `shouldBe` Voidable
+
+    it "§110②: 제3자 사기, 상대방 선의 → 취소 불가 (유효)" $ do
+      let j = query (FraudAct person act1)
+                (Set.singleton (Custom "third-party-fraud"))
+      verdict j `shouldBe` Valid
+
+  describe "verdictMeet — 독립된 판단 결합" $ do
+    it "Void ∧ Voidable = Void" $
+      verdictMeet Void Voidable `shouldBe` Void
+    it "Voidable ∧ Valid = Voidable" $
+      verdictMeet Voidable Valid `shouldBe` Voidable
+    it "Valid ∧ Valid = Valid" $
+      verdictMeet Valid Valid `shouldBe` Valid
