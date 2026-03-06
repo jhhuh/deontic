@@ -1,4 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
+-- | Rendering judgments as human-readable reasoning chains.
+--
+-- The 'Step' type extracts the reasoning chain from a 'Judgment' GADT.
+-- The 'Renderer' typeclass allows jurisdiction-specific output formats.
 module Deontic.Render
   ( Renderer(..)
   , judgmentSteps
@@ -20,7 +24,11 @@ data Step = Step
   , stepSourceText :: Text
   } deriving (Eq, Show)
 
-data StepKind = Applied | Overridden | Delegated
+-- | What happened at each layer of the reasoning chain.
+data StepKind
+  = Applied    -- ^ Base rule was applied directly
+  | Overridden -- ^ This layer overrode a lower layer's verdict
+  | Delegated  -- ^ This layer delegated to a lower layer (no override)
   deriving (Eq, Show)
 
 -- | Extract the reasoning steps from a Judgment GADT (bottom-up)

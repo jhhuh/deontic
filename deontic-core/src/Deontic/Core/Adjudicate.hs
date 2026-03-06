@@ -1,3 +1,8 @@
+-- | Core adjudication engine: stratified defeasible reasoning.
+--
+-- The 'Adjudicate' typeclass resolves legal rules via GHC's instance
+-- resolution. The 'Judgment' GADT carries the full reasoning chain
+-- as a proof term.
 module Deontic.Core.Adjudicate
   ( Adjudicate(..)
   , Judgment(..)
