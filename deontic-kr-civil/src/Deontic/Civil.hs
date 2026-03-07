@@ -15,6 +15,11 @@
 -- Agency              §114,§118  AuthAgencyAct         '[Proviso, Base]                    자기계약 금지
 --                     §125-132   UnauthAgencyAct       '[ApparentAuth, Ratification, Base] 표현대리·추인
 -- Rescission          §146       RescissionAct         '[Base]                             제척기간 (3년\/10년, §157 역산)
+-- AgencyRemedies     §134-135   AgencyWithdrawalAct   '[CounterpartyKnowledge, Base]       상대방 악의 면책
+--                               AgentLiabilityAct     '[Proviso, Base]                     대리인 면책
+-- Invalidity         §137-139   PartialInvalidityAct  '[Conversion, HypotheticalIntent, Base] 일부무효·전환·추인
+-- Cancellation       §141-145   CancellableAct        '[ConstructiveRatification, GeneralRatification, Base] wrapper pattern
+-- ConditionalAct     §147-152   ConditionalAct        '[BadFaithCondition, IllegalCondition, Base] 정지\/해제조건·시기\/종기
 -- @
 --
 -- == 물권법 (Property Law)
@@ -64,16 +69,19 @@
 -- * __Universal quantification__ — @all@ over owners list in instance body (§264)
 -- * __Verdict-conditional override__ — override fires only when @verdict prev == Void@ (§390, §396, §580②)
 -- * __Multi-condition override__ — conjunction of several facts required (§639 묵시적 갱신)
+-- * __Wrapper pattern__ — CancellableAct takes prior Verdict as input, applies meta-rules (§141-§145)
+-- * __Deemed fulfillment__ — bad faith re-evaluates condition state via recursive query (§150)
 --
 -- = Fact Type Strategy
 --
 -- * @Set CivilFact@ — for boolean\/flag-based facts (§5, §103-110, §114-132, §186-188, §197-200)
 -- * Domain records — for structured facts: 'PrescriptionFacts', 'RescissionFacts',
---   'AcqPrescFacts', 'DefaultFacts', 'WarrantyFacts', 'LeaseFacts', 'CoOwnershipFacts', 'TortFacts'
+--   'AcqPrescFacts', 'DefaultFacts', 'WarrantyFacts', 'LeaseFacts', 'CoOwnershipFacts', 'TortFacts',
+--   'PartialInvalidityFacts', 'CancellationFacts', 'ConditionalFacts'
 --
 -- = Test Coverage
 --
--- 166 tests across unit tests (per-module), case studies (multi-issue disputes),
+-- 203 tests across unit tests (per-module), case studies (multi-issue disputes),
 -- and real-case tests (based on 대법원 판례).
 --
 module Deontic.Civil
@@ -92,6 +100,10 @@ module Deontic.Civil
   , module Deontic.Civil.DefaultObligation
   , module Deontic.Civil.SaleWarranty
   , module Deontic.Civil.Lease
+  , module Deontic.Civil.AgencyRemedies
+  , module Deontic.Civil.Invalidity
+  , module Deontic.Civil.Cancellation
+  , module Deontic.Civil.ConditionalAct
   , module Deontic.Civil.Render
   ) where
 
@@ -109,4 +121,8 @@ import Deontic.Civil.AcquisitivePrescription ()
 import Deontic.Civil.DefaultObligation ()
 import Deontic.Civil.SaleWarranty ()
 import Deontic.Civil.Lease ()
+import Deontic.Civil.AgencyRemedies ()
+import Deontic.Civil.Invalidity ()
+import Deontic.Civil.Cancellation ()
+import Deontic.Civil.ConditionalAct ()
 import Deontic.Civil.Render
