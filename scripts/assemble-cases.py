@@ -241,9 +241,9 @@ def main():
     parts.append("\n---\n\n" + appendix)
 
     if lang == "en":
-        output_path = os.path.join(SCRIPT_DIR, "..", "docs", "civil-act", "case-demonstrations.md")
+        output_path = os.path.join(SCRIPT_DIR, "..", "docs", "civil-act", "en-case-demonstrations.md")
     else:
-        output_path = os.path.join(SCRIPT_DIR, "..", "docs", "civil-act", f"case-demonstrations.{lang}.md")
+        output_path = os.path.join(SCRIPT_DIR, "..", "docs", "ko", "civil-act", "case-demonstrations.md")
 
     output = os.path.abspath(output_path)
     with open(output, "w") as f:

@@ -45,13 +45,16 @@
         version = "0.2.0";
         src = pkgs.lib.sourceByRegex ./. [
           "mkdocs.yml"
+          "mkdocs-ko.yml"
           "docs"
           "docs/.*"
           "docs/.*/.*"
+          "docs/.*/.*/.*"
         ];
         nativeBuildInputs = [ mkdocs-env ];
         buildPhase = ''
           ${mkdocs-env}/bin/mkdocs build -d _site
+          ${mkdocs-env}/bin/mkdocs build -f mkdocs-ko.yml -d _site/ko
         '';
         installPhase = ''
           mv _site $out

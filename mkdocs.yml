@@ -51,6 +51,13 @@ extra_javascript:
   - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
 
 extra:
+  alternate:
+    - name: English
+      link: /deontic/
+      lang: en
+    - name: 한국어
+      link: /deontic/ko/
+      lang: ko
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/jhhuh/deontic

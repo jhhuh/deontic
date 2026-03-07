@@ -1,0 +1,72 @@
+site_name: "Deotonic — 번복 가능 의무논리를 위한 Curry-Howard 대응"
+site_description: "법률 조문을 타입 수준 프로그램으로 인코딩하는 Haskell 프레임워크"
+site_url: "https://jhhuh.github.io/deontic/ko/"
+repo_url: "https://github.com/jhhuh/deontic"
+repo_name: jhhuh/deontic
+docs_dir: docs/ko
+site_dir: site/ko
+
+theme:
+  name: material
+  language: ko
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: 다크 모드로 전환
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: 라이트 모드로 전환
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.arithmatex:
+      generic: true
+  - attr_list
+  - md_in_html
+  - footnotes
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js
+
+extra:
+  alternate:
+    - name: English
+      link: /deontic/
+      lang: en
+    - name: 한국어
+      link: /deontic/ko/
+      lang: ko
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/jhhuh/deontic
+
+nav:
+  - 홈: index.md
+  - 한국 민법:
+    - civil-act/index.md
+    - 판례 시연: civil-act/case-demonstrations.md
