@@ -1,3 +1,7 @@
+<style>
+table { width: 100%; }
+</style>
+
 # Case Demonstrations: Framework vs Court
 
 Each case shows three tables:
