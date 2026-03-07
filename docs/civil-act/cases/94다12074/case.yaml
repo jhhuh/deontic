@@ -1,0 +1,37 @@
+title: "통정허위표시 — 선의 제3자 심리 미진"
+court: "대법원 94다12074"
+section: "§108 통정허위표시"
+
+identity:
+  - id: corp
+    role: "소외 회사 (태영공영, 부동산 원소유자)"
+    haskell: 'PersonId "corp"'
+  - id: sooe1
+    role: "소외 1 (허위 가등기 명의인)"
+    haskell: 'PersonId "sooe1"'
+  - id: defendants
+    role: "피고들 (소외 2로부터 양수한 자, 선의 여부 미심리)"
+    haskell: 'PersonId "defendants"'
+  - id: sham-act
+    role: "소외 회사-소외 1 간 허위 매매예약"
+    haskell: 'ActId "sham-reservation"'
+
+facts:
+  - description: "소외 회사와 소외 1 간 매매예약은 통정허위표시이다"
+    haskell: "HiddenIntention"
+    source: "이유: 재산을 도피 또는 은닉할 목적으로 통정"
+  - description: "소외 1은 허위임을 알고 있었다"
+    haskell: "CounterpartyKnew"
+    source: "이유: 통정하여 한 것"
+  - description: "피고들의 선의 여부는 미심리 (환송 사유)"
+    haskell: "BonaFideThirdParty 여부 미확인"
+    source: "이유: 선의였는지 여부에 관하여 심리하지 아니한 채"
+
+# 피고들의 선의를 가정하면 §108② 적용 → 유효
+# 피고들이 악의이면 §108① 적용 → 무효
+# 환송심에서 심리할 사항이므로 BonaFideThirdParty 포함하여 §108② 경로 시연
+eval: |
+  let cf = (defaultCaseFacts (PersonId "corp") (ActId "sham-reservation"))
+            { cfCivilFacts = Set.singleton BonaFideThirdParty
+            }
+  in printResults cf

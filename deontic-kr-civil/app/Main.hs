@@ -21,7 +21,7 @@ import Deontic.Civil.CoOwnership ()
 import Deontic.Civil.Possession ()
 import Deontic.Civil.Prescription ()
 import Deontic.Civil.Tort ()
-import Deontic.Civil.Render (KoreanRenderer(..))
+import Deontic.Civil.Render (KoreanRenderer(..), OutputFormat(..))
 
 main :: IO ()
 main = do
@@ -98,7 +98,7 @@ handleMinorAct = do
     ]
   let j = query (MinorAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleJuristicAct :: IO ()
 handleJuristicAct = do
@@ -112,7 +112,7 @@ handleJuristicAct = do
     ]
   let j = query (JuristicAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleShamAct :: IO ()
 handleShamAct = do
@@ -123,7 +123,7 @@ handleShamAct = do
     ]
   let j = query (ShamAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleMistakeAct :: IO ()
 handleMistakeAct = do
@@ -134,7 +134,7 @@ handleMistakeAct = do
     ]
   let j = query (MistakeAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleFraudAct :: IO ()
 handleFraudAct = do
@@ -146,7 +146,7 @@ handleFraudAct = do
     ]
   let j = query (FraudAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleAuthAgency :: IO ()
 handleAuthAgency = do
@@ -158,7 +158,7 @@ handleAuthAgency = do
     ]
   let j = query (AuthAgencyAct principal agent actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleUnauthAgency :: IO ()
 handleUnauthAgency = do
@@ -173,7 +173,7 @@ handleUnauthAgency = do
     ]
   let j = query (UnauthAgencyAct principal agent actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handlePossession :: IO ()
 handlePossession = do
@@ -187,7 +187,7 @@ handlePossession = do
     ]
   let j = query (PossessionAct actor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handlePrescription :: IO ()
 handlePrescription = do
@@ -238,7 +238,7 @@ handlePrescription = do
         }
       j = query (PrescriptionAct creditor claimId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleCoOwnership :: IO ()
 handleCoOwnership = do
@@ -259,7 +259,7 @@ handleCoOwnership = do
       facts = CoOwnershipFacts { cofOwners = owners, cofConsented = consented }
       j = query (CoOwnershipAct actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)
 
 handleTort :: IO ()
 handleTort = do
@@ -280,4 +280,4 @@ handleTort = do
   let facts = TortFacts fault unlawful damage causation victimNeg
       j = query (TortAct victim tortfeasor actId) facts
   TIO.putStrLn ""
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)

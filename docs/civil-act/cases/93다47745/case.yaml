@@ -1,0 +1,16 @@
+title: "취득시효 — 점유 승계와 등기청구권"
+court: "대법원 93다47745"
+section: "§245 취득시효"
+
+identity:
+  - role: "점유자"
+    haskell: 'PersonId "점유자"'
+  - role: "부동산 점유"
+    haskell: 'ActId "부동산점유"'
+
+facts:
+  - description: "20년간 소유의 의사로 평온·공연하게 점유"
+    haskell: "취득시효 사실관계 (AcqPrescFacts)"
+
+# Note: This case is about 취득시효 (§245), not 소멸시효 (§162).
+# It is NOT used for the 소멸시효 demonstration.

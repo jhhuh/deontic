@@ -1,0 +1,32 @@
+title: "무권대리 + 표현대리 불성립"
+court: "대법원 91다32190"
+section: "§126 표현대리"
+
+identity:
+  - id: principal
+    role: "증권회사 (본인)"
+    haskell: 'PersonId "principal"'
+  - id: agent
+    role: "사실상 투자상담사 (무권대리인)"
+    haskell: 'PersonId "agent"'
+  - id: counterparty
+    role: "고객/투자자 (상대방)"
+    haskell: 'PersonId "counterparty"'
+  - id: contract
+    role: "예탁금 수령 및 위탁매매계약"
+    haskell: 'ActId "contract"'
+
+facts:
+  - description: "대리인이 권한을 넘어 계약 체결"
+    haskell: "ExceededScope"
+    source: "판결요지 나"
+  - description: "위임받은 업무는 사실행위에 불과하여 기본대리권 부정"
+    haskell: "Custom: NoBasicAgencyAuthority (ADT 미지원)"
+    source: "판결요지 나"
+
+eval: |
+  let cf = (defaultCaseFacts (PersonId "principal") (ActId "contract"))
+            { cfCounterparty = Just (PersonId "agent")
+            , cfCivilFacts = Set.singleton ExceededScope
+            }
+  in printResults cf

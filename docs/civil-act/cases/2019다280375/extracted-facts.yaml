@@ -1,0 +1,81 @@
+identity:
+  - role: "갑 - 부동산 소유자"
+    haskell: 'PersonId "gap"'
+  - role: "을 - 허위 가등기 수령자, 갑으로부터 매매예약 가등기를 받음"
+    haskell: 'PersonId "eul"'
+  - role: "병 - 을의 남편, 재산분할로 지분이전등기"
+    haskell: 'PersonId "byeong"'
+  - role: "정 - 순차 매수인"
+    haskell: 'PersonId "jeong"'
+  - role: "무 - 최종 매수인 (제3자 해당 여부 쟁점)"
+    haskell: 'PersonId "mu"'
+  - role: "갑-을 간 허위 매매예약 (가등기 원인행위)"
+    haskell: 'ActId "sham-sale-reservation"'
+  - role: "을 명의 본등기 (확정판결 원인, 원인무효)"
+    haskell: 'ActId "eul-main-registration"'
+  - role: "무의 지분소유권이전등기 (매매 원인)"
+    haskell: 'ActId "mu-purchase"'
+
+facts:
+  - description: "갑은 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"gap\")"
+    source: "판결요지 [2] - 부동산 소유자로서 개인 행위"
+
+  - description: "을은 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"eul\")"
+    source: "판결요지 [2] - 갑과의 거래 당사자, 소송 당사자"
+
+  - description: "갑과 을의 매매예약은 통정한 허위의 의사표시이다 (민법 §108)"
+    haskell: "HiddenIntention"
+    source: "판결요지 [2] - 가등기의 등기원인인 매매예약이 갑과 을의 통정한 허위의 의사표시에 의한 것으로 무효"
+
+  - description: "상대방(을)이 허위 의사표시임을 알고 있었다 (통정)"
+    haskell: "CounterpartyKnew"
+    source: "판결요지 [2] - 통정한 허위의 의사표시 (양 당사자 합의에 의한 허위표시)"
+
+  - description: "대상 부동산은 부동산(real property)이다"
+    haskell: "IsRealProperty"
+    source: "판결요지 [2] - 부동산에 관하여 소유권이전등기"
+
+  - description: "을 명의 본등기는 등기가 존재한다 (형식상)"
+    haskell: "HasRegistration"
+    source: "판결요지 [2] - 확정판결을 원인으로 지분소유권이전등기를 마쳤고"
+
+  - description: "무는 선의의 제3자(BonaFideThirdParty)에 해당하지 않는다고 대법원이 판단함"
+    haskell: "Custom \"mu-is-NOT-bona-fide-third-party-per-supreme-court\""
+    source: "판결요지 [2] - 이들은 을 명의의 허위 가등기 자체를 기초로 하여 새로운 법률상 이해관계를 맺은 제3자의 지위에 있다고 볼 수 없다"
+
+  - description: "부동산등기에 공신력이 인정되지 않는다 (한국 법제)"
+    haskell: "Custom \"no-public-trust-in-real-property-registration\""
+    source: "판결요지 [2] - 부동산등기에 관하여 공신력이 인정되지 아니하는 우리 법제"
+
+  - description: "을 명의 본등기는 원인무효의 등기이다 (소급적으로 무효가 된 제1심판결에 기초)"
+    haskell: "Custom \"main-registration-void-ab-initio\""
+    source: "판결요지 [2] - 항소심판결에 의해 취소·확정되어 소급적으로 무효가 된 제1심판결에 기초하여 일방적으로 마친 원인무효의 등기"
+
+  - description: "갑과 을 사이의 통정한 허위의 의사표시가 실체적으로 철회되었다 (추완항소)"
+    haskell: "Custom \"sham-declaration-substantively-withdrawn-via-belated-appeal\""
+    source: "판결요지 [2] - 갑의 추완항소를 계기로 갑과 을 사이의 통정한 허위의 의사표시가 실체적으로는 철회되었음"
+
+eval: |
+  -- Primary juristic act: sham sale reservation between gap and eul (민법 §108)
+  let cf = (defaultCaseFacts (PersonId "gap") (ActId "sham-sale-reservation"))
+            { cfCivilFacts = Set.fromList
+                [ IsNaturalPerson (PersonId "gap")
+                , IsNaturalPerson (PersonId "eul")
+                , HiddenIntention
+                , CounterpartyKnew
+                , IsRealProperty
+                , HasRegistration
+                , Custom "mu-is-NOT-bona-fide-third-party-per-supreme-court"
+                , Custom "no-public-trust-in-real-property-registration"
+                , Custom "main-registration-void-ab-initio"
+                , Custom "sham-declaration-substantively-withdrawn-via-belated-appeal"
+                ]
+            }
+  in printResults cf
+  -- Note: BonaFideThirdParty is deliberately NOT included because the
+  -- Supreme Court held that 무 does NOT qualify as a bona fide third party
+  -- under §108(2). The sham provisional registration (가등기) and the
+  -- void main registration (본등기) are legally severed, so subsequent
+  -- transferees cannot claim protection under the sham transaction doctrine.

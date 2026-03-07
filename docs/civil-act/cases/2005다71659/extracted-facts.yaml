@@ -1,0 +1,61 @@
+# 대법원 2005다71659 - Extracted Facts
+# 미성년자의 신용구매계약 취소 및 법정대리인의 묵시적 동의/처분허락
+
+identity:
+  - role: "미성년자 (만 19세 초과, 신용구매계약 체결자)"
+    haskell: 'PersonId "minor"'
+  - role: "신용카드 가맹점 (신용구매계약 상대방)"
+    haskell: 'PersonId "merchant"'
+  - role: "법정대리인 (미성년자의 친권자/후견인)"
+    haskell: 'PersonId "guardian"'
+  - role: "신용구매계약 (신용카드 이용 재화/용역 구매)"
+    haskell: 'ActId "credit-purchase"'
+
+facts:
+  - description: "계약 체결자는 미성년자이다"
+    haskell: "IsMinor (PersonId \"minor\")"
+    source: "판결요지 [4] '만 19세가 넘은 미성년자'"
+
+  - description: "미성년자는 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"minor\")"
+    source: "판결요지 전체 - 미성년자 개인"
+
+  - description: "미성년자에게 법정대리인이 있다"
+    haskell: "HasGuardian (PersonId \"minor\") (PersonId \"guardian\")"
+    source: "판결요지 [1] '법정대리인의 동의'"
+
+  - description: "미성년자가 신용구매계약을 체결하였다 (법률행위 수행)"
+    haskell: "PerformsAct (PersonId \"minor\") (ActId \"credit-purchase\")"
+    source: "판결요지 [1] '신용구매계약을 체결', [4] '신용구매계약을 체결한 사안'"
+
+  - description: "법정대리인의 명시적 동의는 없었다"
+    haskell: "Custom \"NoExplicitConsent\""
+    source: "판결요지 [1] '법정대리인의 동의가 없었음을 들어'"
+
+  - description: "법정대리인의 묵시적 처분허락이 소득 범위 내에서 인정됨 (법원 판단)"
+    haskell: "HasConsent (PersonId \"guardian\") (ActId \"credit-purchase\")"
+    source: "판결요지 [4] '법정대리인의 묵시적 처분허락이 있었다고 보아'"
+
+  - description: "신용구매가 월 소득범위 내에서 이루어짐 (처분허락 범위 내)"
+    haskell: "Custom \"WithinDisposableIncomeRange\""
+    source: "판결요지 [4] '월 소득범위 내에서 신용구매계약을 체결'"
+
+  - description: "미성년자가 독자적 소득을 얻고 있었음"
+    haskell: "Custom \"HasIndependentIncome\""
+    source: "판결요지 [4] '스스로 얻고 있던 소득'"
+
+eval: |
+  let cf = (defaultCaseFacts (PersonId "minor") (ActId "credit-purchase"))
+            { cfCivilFacts = Set.fromList
+                [ IsNaturalPerson (PersonId "minor")
+                , IsMinor (PersonId "minor")
+                , HasGuardian (PersonId "minor") (PersonId "guardian")
+                , PerformsAct (PersonId "minor") (ActId "credit-purchase")
+                , HasConsent (PersonId "guardian") (ActId "credit-purchase")
+                , Custom "NoExplicitConsent"
+                , Custom "HasIndependentIncome"
+                , Custom "WithinDisposableIncomeRange"
+                ]
+            , cfCounterparty = Just (PersonId "merchant")
+            }
+  in printResults cf

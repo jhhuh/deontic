@@ -1,0 +1,82 @@
+case: "대법원 98다60828"
+date: "1999-02-23"
+subject: "민법 제110조 제2항 - 제3자 사기에서 상대방 대리인의 사기는 제3자 사기가 아님"
+
+identity:
+  - role: "원고 은행 (금융기관, 법인)"
+    haskell: 'PersonId "bank"'
+  - role: "피고 1 (금산건설 직원, 주채무자)"
+    haskell: 'PersonId "defendant1"'
+  - role: "피고 2 (피고 4의 친구, 연대보증인)"
+    haskell: 'PersonId "defendant2"'
+  - role: "피고 3 (금산건설 직원, 주채무자)"
+    haskell: 'PersonId "defendant3"'
+  - role: "피고 4 (금산건설 경영자, 연대보증인)"
+    haskell: 'PersonId "defendant4"'
+  - role: "소외 1 (원고 은행 출장소장, 사기 행위자)"
+    haskell: 'PersonId "branchManager"'
+  - role: "금전소비대차 및 연대보증 약정 (사기에 의한 의사표시)"
+    haskell: 'ActId "loanAgreement"'
+
+facts:
+  - description: "원고는 은행(법인)이다"
+    haskell: "IsJuristicPerson (PersonId \"bank\")"
+    source: "원고 은행 (판결문 전체)"
+
+  - description: "피고 1은 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"defendant1\")"
+    source: "피고 1과 피고 3은 위 회사의 직원들"
+
+  - description: "피고 2는 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"defendant2\")"
+    source: "피고 2는 피고 4의 친구"
+
+  - description: "피고 3은 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"defendant3\")"
+    source: "피고 1과 피고 3은 위 회사의 직원들"
+
+  - description: "피고 4는 자연인이다"
+    haskell: "IsNaturalPerson (PersonId \"defendant4\")"
+    source: "금산건설 주식회사를 경영하는 피고 4"
+
+  - description: "피고들이 금전소비대차 및 연대보증 약정의 의사표시를 하였다 (사기에 의해 유도됨)"
+    haskell: "PerformsAct (PersonId \"defendant1\") (ActId \"loanAgreement\")"
+    source: "피고들로 하여금 ... 금전소비대차약정서 2장 등 대출관련 서류에 서명·날인하게 한"
+
+  - description: "소외 1(출장소장)이 피고들에 대해 사기를 행사하였다 - 제3자 사기가 아닌 상대방(은행)과 동일시할 수 있는 자의 사기"
+    haskell: "Custom \"AgentFraud: branchManager committed fraud identifiable with counterparty bank, not third-party fraud (민법 §110②)\""
+    source: "소외 1의 사기는 원고 또는 원고와 동일시할 수 있는 자의 사기일 뿐 제3자의 사기로 볼 수 없으므로"
+
+  - description: "상대방(은행)이 사기 사실을 알았는지 여부는 취소 요건이 아님 (제3자 사기가 아니므로)"
+    haskell: "Custom \"CounterpartyKnowledge irrelevant: not third-party fraud, so §110② limitation does not apply\""
+    source: "원고가 소외 1의 사기사실을 알았거나 알 수 있었을 경우에 한하여 피고가 위 약정을 취소할 수 있다고 볼 것은 아니다"
+
+  # Note: ThirdPartyFraud constructor exists but court NEGATED it - the fraud was NOT third-party fraud
+  # Note: CounterpartyKnewFraud is also not applicable - court held this requirement does not apply
+
+eval: |
+  -- This case primarily concerns §110 (fraud in declarations of intent)
+  -- The key legal holding is NEGATIVE: the branch manager's fraud is NOT third-party fraud
+  -- Available constructors do not fully capture agency/representative fraud
+  let cf = (defaultCaseFacts (PersonId "defendant1") (ActId "loanAgreement"))
+            { cfCivilFacts = Set.fromList
+                [ IsJuristicPerson (PersonId "bank")
+                , IsNaturalPerson (PersonId "defendant1")
+                , IsNaturalPerson (PersonId "defendant2")
+                , IsNaturalPerson (PersonId "defendant3")
+                , IsNaturalPerson (PersonId "defendant4")
+                , PerformsAct (PersonId "defendant1") (ActId "loanAgreement")
+                , Custom "AgentFraud: branchManager committed fraud identifiable with counterparty bank, not third-party fraud (민법 §110②)"
+                ]
+            }
+  in printResults cf
+
+notes: |
+  이 판결의 핵심 법리:
+  1. 상대방의 대리인 등 상대방과 동일시할 수 있는 자의 사기는 민법 §110②의 "제3자의 사기"에 해당하지 않는다.
+  2. 따라서 피고들은 은행이 사기 사실을 알았는지 여부와 관계없이 의사표시를 취소할 수 있다.
+
+  현재 CivilFact ADT의 한계:
+  - ThirdPartyFraud 생성자는 있으나, "대리인에 의한 사기" (agent fraud identifiable with counterparty) 생성자가 없음.
+  - 이 판례를 제대로 모델링하려면 AgentFraud 또는 RepresentativeFraud 생성자 추가가 필요함.
+  - 또한 "사기에 의한 의사표시" (FraudInducedAct) 같은 생성자도 고려할 필요가 있음.

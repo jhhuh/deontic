@@ -1,0 +1,18 @@
+title: "점유 추정 + 악의 반증"
+court: null
+section: "§197 점유 추정"
+
+identity:
+  - role: "점유자"
+    haskell: 'PersonId "점유자"'
+  - role: "부동산 점유"
+    haskell: 'ActId "부동산점유"'
+
+facts:
+  - description: "점유자가 악의로 점유한 사실이 인정됨"
+    haskell: "BadFaith"
+
+eval: |
+  let cf = (defaultCaseFacts (PersonId "점유자") (ActId "부동산점유"))
+            { cfCivilFacts = Set.singleton BadFaith }
+  in printResults cf

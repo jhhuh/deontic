@@ -1,0 +1,27 @@
+title: "착오 + 중대한 과실 + 상대방 이용"
+court: "대법원 2013다49794"
+section: "§109 착오에 의한 의사표시"
+
+identity:
+  - id: declarant
+    role: "표의자 (착오로 의사표시를 한 자)"
+    haskell: 'PersonId "declarant"'
+  - id: counterparty
+    role: "상대방 (착오를 알고 이용한 자)"
+    haskell: 'PersonId "counterparty"'
+  - id: declaration
+    role: "의사표시 (착오 있는 법률행위)"
+    haskell: 'ActId "declaration"'
+
+facts:
+  - description: "표의자에게 중대한 과실이 있었음"
+    haskell: "GrossNegligence"
+    source: "판결요지 [2]"
+  - description: "상대방이 표의자의 착오를 알고 이를 이용하였음"
+    haskell: "CounterpartyKnew"
+    source: "판결요지 [2]"
+
+eval: |
+  let cf = (defaultCaseFacts (PersonId "declarant") (ActId "declaration"))
+            { cfCivilFacts = Set.fromList [GrossNegligence, CounterpartyKnew] }
+  in printResults cf

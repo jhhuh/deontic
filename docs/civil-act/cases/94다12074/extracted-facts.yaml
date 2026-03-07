@@ -1,0 +1,85 @@
+# 대법원 94다12074 (1996. 4. 26.) - Extracted Facts
+# 민법 §108 통정허위표시 (Collusive Sham Declaration) + 선의의 제3자 보호
+
+identity:
+  - role: "소외 회사 (주식회사 태영공영) - 부동산 원소유자, 허위표시 당사자"
+    haskell: 'PersonId "taeyoung-corp"'
+  - role: "소외 1 - 허위 가등기/본등기 명의인, 허위표시 상대방"
+    haskell: 'PersonId "sooe1"'
+  - role: "소외 2 - 소외 회사 대표이사, 허위 가등기/본등기 명의인"
+    haskell: 'PersonId "sooe2"'
+  - role: "원고들 - 소외 회사로부터 부동산을 매수한 정당한 매수인"
+    haskell: 'PersonId "plaintiffs"'
+  - role: "피고 1 - 소외 2로부터 디동 408,414,504,506호를 양수"
+    haskell: 'PersonId "defendant1"'
+  - role: "피고 2 - 소외 2로부터 이동 111호를 양수"
+    haskell: 'PersonId "defendant2"'
+
+  - role: "소외 회사와 소외 1 간 허위 매매예약 (가등기 원인)"
+    haskell: 'ActId "sham-sale-reservation-corp-sooe1"'
+  - role: "소외 1 명의 가등기에 기한 본등기 (허위)"
+    haskell: 'ActId "sham-main-registration-sooe1"'
+  - role: "소외 1과 소외 2 간 가등기 권리 이전 (허위)"
+    haskell: 'ActId "sham-transfer-sooe1-sooe2"'
+  - role: "피고들의 소외 2로부터의 부동산 양수 행위"
+    haskell: 'ActId "purchase-by-defendants"'
+
+facts:
+  # --- 법원이 확인한 사실 (Confirmed) ---
+
+  - description: "소외 회사(태영공영)는 주식회사(법인)이다"
+    haskell: "IsJuristicPerson (PersonId \"taeyoung-corp\")"
+    source: "소외 주식회사 태영공영"
+
+  - description: "대상 부동산은 부동산(아파트)이다"
+    haskell: "IsRealProperty"
+    source: "대전 서구 디동/이동 아파트"
+
+  - description: "부동산에 등기(소유권보존등기, 이전등기, 가등기)가 있다"
+    haskell: "HasRegistration"
+    source: "소외 회사 명의로 소유권보존등기가 되어 있던"
+
+  - description: "소외 회사와 소외 1 간의 매매예약은 통정허위표시이다 (재산도피 목적, 아무런 원인 없이 통정)"
+    haskell: "HiddenIntention"
+    source: "소외 회사가 그 재산을 도피 또는 은닉할 목적으로 소외 1과 사이에서 아무런 원인도 없이 통정하여 한 것"
+
+  - description: "소외 1은 허위표시임을 알고 있었다 (통정의 상대방)"
+    haskell: "CounterpartyKnew"
+    source: "통정하여 한 것 — 통정허위표시는 양 당사자가 허위임을 인식"
+
+  - description: "소외 1과 소외 2 간의 가등기 권리 이전도 실질적 채권채무관계 없이 이루어짐"
+    haskell: "Custom \"CollusiveSham: sooe1-sooe2 간 채권채무관계 없이 편의상 권리이전\""
+    source: "소외 1과 소외 2가 서로 간에 아무런 채권·채무관계가 없음에도 ... 편의상 이루어졌다 하여"
+
+  - description: "원고들은 소외 회사로부터 적법하게 부동산을 매수하고 소유권이전등기를 마침"
+    haskell: "PerformsAct (PersonId \"plaintiffs\") (ActId \"legitimate-purchase\")"
+    source: "원고들은 1987. 11. 9. 소외 회사로부터 이 사건 각 부동산을 매수하고 ... 소유권이전등기를 한 사실"
+
+  - description: "피고들은 소외 2로부터 부동산을 양수하고 소유권이전등기를 마침"
+    haskell: "PerformsAct (PersonId \"defendant1\") (ActId \"purchase-by-defendants\")"
+    source: "피고 1 명의의 소유권이전등기가 ... 피고 2 명의의 소유권이전등기가 각 마쳐진 사실"
+
+  # --- 법원이 확인하지 않은 사실 (쟁점으로 환송) ---
+  # 피고들의 선의 여부: 대법원은 이를 심리하지 않은 원심을 파기환송함.
+  # BonaFideThirdParty는 확인된 사실이 아님 — 환송심에서 심리할 사항.
+
+  # NOTE: 대법원 판시 법리:
+  # 만약 피고들이 선의의 제3자라면 (BonaFideThirdParty),
+  # 민법 §108②에 의해 허위표시의 무효를 대항할 수 없고,
+  # 허위표시도 그 표시된 대로 효력이 있다.
+
+eval: |
+  -- 주된 법률행위: 소외 회사와 소외 1 간의 허위 매매예약
+  let cf = (defaultCaseFacts (PersonId "taeyoung-corp") (ActId "sham-sale-reservation-corp-sooe1"))
+            { cfCivilFacts = Set.fromList
+                [ IsJuristicPerson (PersonId "taeyoung-corp")
+                , IsRealProperty
+                , HasRegistration
+                , HiddenIntention
+                , CounterpartyKnew
+                -- BonaFideThirdParty  -- NOT confirmed; remanded for determination
+                ]
+            }
+  in printResults cf
+  -- Expected: §108① 통정허위표시 무효 적용
+  -- If BonaFideThirdParty were added: §108② 선의의 제3자 보호 적용

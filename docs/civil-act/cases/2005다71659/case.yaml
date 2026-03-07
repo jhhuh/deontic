@@ -1,0 +1,38 @@
+title: "미성년자의 신용구매"
+court: "대법원 2005다71659"
+section: "§5 미성년자의 법률행위"
+
+identity:
+  - id: minor
+    role: "미성년자 (만 19세, 신용구매계약 체결자)"
+    haskell: 'PersonId "minor"'
+  - id: guardian
+    role: "법정대리인"
+    haskell: 'PersonId "guardian"'
+  - id: merchant
+    role: "신용카드 가맹점 (상대방)"
+    haskell: 'PersonId "merchant"'
+  - id: contract
+    role: "신용구매계약"
+    haskell: 'ActId "contract"'
+
+facts:
+  - description: "계약 체결자는 미성년자이다"
+    haskell: 'IsMinor minor'
+    source: "판결요지 [4]"
+  - description: "미성년자에게 법정대리인이 있다"
+    haskell: 'HasGuardian minor guardian'
+    source: "판결요지 [1]"
+  - description: "법정대리인의 묵시적 처분허락이 소득 범위 내에서 인정됨"
+    haskell: 'HasConsent guardian contract'
+    source: "판결요지 [4]"
+
+eval: |
+  let cf = (defaultCaseFacts (PersonId "minor") (ActId "contract"))
+            { cfCivilFacts = Set.fromList
+                [ IsMinor (PersonId "minor")
+                , HasGuardian (PersonId "minor") (PersonId "guardian")
+                , HasConsent (PersonId "guardian") (ActId "contract")
+                ]
+            }
+  in printResults cf

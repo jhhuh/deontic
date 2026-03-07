@@ -1,0 +1,39 @@
+title: "복합 쟁점 — 미성년자 사기매매 + 시효완성"
+court: null
+section: "§5, §110, §162 복합"
+
+identity:
+  - role: "갑 (17세, 미성년 소유자)"
+    haskell: 'PersonId "갑"'
+  - role: "을 (상대방)"
+    haskell: 'PersonId "을"'
+  - role: "토지매매"
+    haskell: 'ActId "토지매매"'
+
+facts:
+  - description: "갑은 미성년자이다"
+    haskell: 'IsMinor (PersonId "갑")'
+  - description: "제3자의 사기에 의한 매매"
+    haskell: "ThirdPartyFraud"
+  - description: "법률행위일: 2005-01-01"
+    haskell: "pfClaimDate = fromGregorian 2005 1 1"
+  - description: "소 제기: 2018-06-01 (13년 경과)"
+    haskell: "pfCurrentDate = fromGregorian 2018 6 1"
+  - description: "시효기간: 10년, 중단 없음"
+    haskell: "pfPeriodYears = 10, pfInterruptedOn = Nothing"
+
+eval: |
+  let cf = domainFact PrescriptionK PrescriptionFacts
+                { pfClaimDate    = fromGregorian 2005 1 1
+                , pfCurrentDate  = fromGregorian 2018 6 1
+                , pfPeriodYears  = 10
+                , pfInterruptedOn = Nothing
+                }
+              $ (defaultCaseFacts (PersonId "갑") (ActId "토지매매"))
+                  { cfCounterparty = Just (PersonId "을")
+                  , cfCivilFacts = Set.fromList
+                      [ IsMinor (PersonId "갑")
+                      , ThirdPartyFraud
+                      ]
+                  }
+  in printResults cf

@@ -1,0 +1,46 @@
+# 대법원 2013다49794 — Extracted Facts
+# Topic: 민법 제109조 (착오에 의한 의사표시 취소)
+#
+# NOTE: This judgment contains only 판결요지 (legal holdings summary),
+# not detailed case facts. The parties and specific act details are not
+# described in the available text. We reconstruct the legal scenario
+# the court confirmed.
+
+identity:
+  - role: "표의자 (착오로 의사표시를 한 자)"
+    haskell: 'PersonId "declarant"'
+  - role: "상대방 (의사표시의 상대방)"
+    haskell: 'PersonId "counterparty"'
+  - role: "의사표시 (착오 있는 법률행위)"
+    haskell: 'ActId "mistaken-declaration"'
+
+facts:
+  # [2]에서 법원이 확인한 핵심 사실관계 시나리오
+  - description: "표의자에게 중대한 과실이 있었음 (착오가 표의자의 중대한 과실로 인한 것)"
+    haskell: "GrossNegligence"
+    source: "판결요지 [2]: '착오가 표의자의 중대한 과실로 인한 것이라고 하더라도'"
+
+  - description: "상대방이 표의자의 착오를 알고 이를 이용하였음"
+    haskell: "CounterpartyKnew"
+    source: "판결요지 [2]: '상대방이 표의자의 착오를 알고 이를 이용한 경우'"
+
+  # 판결요지에서 직접 매칭되는 constructor가 없는 확인된 법리
+  - description: "의사표시에 법률행위 내용의 중요부분에 관한 착오가 있었음 (§109 적용 전제)"
+    haskell: 'Custom "MistakeInEssentialElement"'
+    source: "판결요지 [1]: '착오가 법률행위 내용의 중요 부분에 관한 것'"
+
+  - description: "금융투자상품시장 거래에도 민법 §109 적용됨 (적용배제 규정 없는 한)"
+    haskell: 'Custom "CivilCode109ApplicableToFinancialMarket"'
+    source: "판결요지 [1]: '거래소의 업무규정에서 민법 제109조의 적용을 배제하거나 제한하고 있는 등의 특별한 사정이 없는 한'"
+
+eval: |
+  -- 판결요지 [2]의 시나리오: 중대한 과실 + 상대방 인지 -> 취소 가능
+  let cf = (defaultCaseFacts (PersonId "declarant") (ActId "mistaken-declaration"))
+            { cfCivilFacts = Set.fromList
+                [ GrossNegligence
+                , CounterpartyKnew
+                , Custom "MistakeInEssentialElement"
+                ]
+            }
+  in printResults cf
+  -- Expected: §109①단서에도 불구하고 취소 가능 (상대방이 착오를 알고 이용했으므로)

@@ -27,6 +27,18 @@
         ps.pymdown-extensions
       ]);
 
+      # Pinned HTML sources from casenote.kr (sha256-verified, Nix-cached)
+      caseSources = import ./nix/case-sources.nix { inherit (pkgs) fetchurl; };
+
+      # Derivation that collects all case HTMLs into a single outpath
+      case-html = pkgs.runCommand "case-html" {} (''
+        mkdir -p $out
+      '' + builtins.concatStringsSep "\n" (
+          pkgs.lib.mapAttrsToList (name: src:
+            "cp ${src} $out/${builtins.replaceStrings ["다"] ["da"] name}.html"
+          ) caseSources
+        ));
+
       # Nix derivation: build complete static site (mkdocs + haddock)
       mkdocs-site = pkgs.stdenv.mkDerivation {
         pname = "deontic-docs";
@@ -63,7 +75,7 @@
     in
     {
       packages.${system} = {
-        inherit deontic-core deontic-kr-civil deontic-de-bgb;
+        inherit deontic-core deontic-kr-civil deontic-de-bgb case-html;
         mkdocs = mkdocs-site;
         default = mkdocs-site;
       };

@@ -1,0 +1,33 @@
+title: "상대방 대리인의 사기 (제3자 사기 부정)"
+court: "대법원 98다60828"
+section: "§110 사기·강박에 의한 의사표시"
+
+identity:
+  - id: bank
+    role: "원고 은행 (상대방)"
+    haskell: 'PersonId "bank"'
+  - id: defendants
+    role: "피고들 (사기에 의해 약정한 자)"
+    haskell: 'PersonId "defendants"'
+  - id: branch-mgr
+    role: "출장소장 (은행과 동일시되는 자, 사기 행위자)"
+    haskell: 'PersonId "branchMgr"'
+  - id: agreement
+    role: "금전소비대차 및 연대보증 약정"
+    haskell: 'ActId "agreement"'
+
+facts:
+  - description: "출장소장이 피고들을 기망하여 약정 체결"
+    haskell: "ThirdPartyFraud"
+    source: "이유 1: 거짓말하고 이에 속은 피고들"
+  - description: "출장소장은 제3자가 아니라 은행과 동일시되는 자 (법원 판단)"
+    haskell: "Custom: AgentIdentifiableWithCounterparty (ADT 미지원)"
+    source: "이유 2: 상대방과 동일시할 수 있는 자의 사기"
+
+# 법원: 출장소장의 사기는 제3자 사기가 아님 → §110② 제한 부적용 → 자유로이 취소 가능
+# 프레임워크: ThirdPartyFraud + CounterpartyKnewFraud 없음 → §110② 적용 → 유효
+# ADT 한계로 인해 불일치 예상
+eval: |
+  let cf = (defaultCaseFacts (PersonId "defendants") (ActId "agreement"))
+            { cfCivilFacts = Set.singleton ThirdPartyFraud }
+  in printResults cf

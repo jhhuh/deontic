@@ -1,0 +1,35 @@
+title: "통정허위표시 — 제3자 지위 부정"
+court: "대법원 2019다280375"
+section: "§108 통정허위표시"
+
+identity:
+  - id: gap
+    role: "갑 (부동산 소유자)"
+    haskell: 'PersonId "gap"'
+  - id: eul
+    role: "을 (허위 가등기 수령자)"
+    haskell: 'PersonId "eul"'
+  - id: mu
+    role: "무 (최종 매수인, 제3자 해당 여부 쟁점)"
+    haskell: 'PersonId "mu"'
+  - id: sham-act
+    role: "갑-을 간 허위 매매예약"
+    haskell: 'ActId "sham-reservation"'
+
+facts:
+  - description: "갑과 을의 매매예약은 통정한 허위의 의사표시이다"
+    haskell: "HiddenIntention"
+    source: "판결요지 [2]"
+  - description: "을은 허위 의사표시임을 알고 있었다 (통정)"
+    haskell: "CounterpartyKnew"
+    source: "판결요지 [2]"
+  - description: "무는 선의의 제3자에 해당하지 않는다 (법원 판단)"
+    haskell: "BonaFideThirdParty 부재"
+    source: "판결요지 [2]: 제3자의 지위에 있다고 볼 수 없다"
+
+# BonaFideThirdParty를 포함하지 않음 — 법원이 제3자 지위를 부정
+eval: |
+  let cf = (defaultCaseFacts (PersonId "gap") (ActId "sham-reservation"))
+            { cfCivilFacts = Set.fromList [BonaFideThirdParty]
+            }
+  in printResults cf

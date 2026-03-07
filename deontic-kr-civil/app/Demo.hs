@@ -16,7 +16,7 @@ import Deontic.Core.Adjudicate (SomeJudgment(..), verdict, combineVerdicts)
 import Deontic.Render (Renderer(..))
 import Deontic.Civil.Types
 import Deontic.Civil.Evaluate
-import Deontic.Civil.Render (KoreanRenderer(..))
+import Deontic.Civil.Render (KoreanRenderer(..), OutputFormat(..))
 
 main :: IO ()
 main = do
@@ -121,4 +121,4 @@ when False _ = pure ()
 printResult :: CaseResult -> IO ()
 printResult (CaseResult label (SomeJudgment j)) = do
   TIO.putStrLn $ "── " <> label <> " ── " <> T.pack (show (verdict j))
-  TIO.putStrLn (renderJudgment KoreanRenderer j)
+  TIO.putStrLn (renderJudgment (KoreanRenderer PlainText) j)

@@ -12,12 +12,12 @@ import Deontic.Render (Renderer(..))
 import Deontic.Civil.Types (MinorAct(..), JuristicAct(..), CivilFact(..))
 import Deontic.Civil.Persons ()
 import Deontic.Civil.Acts ()
-import Deontic.Civil.Render (KoreanRenderer(..))
+import Deontic.Civil.Render (KoreanRenderer(..), OutputFormat(..))
 
 spec :: Spec
 spec = do
   describe "KoreanRenderer" $ do
-    let renderer = KoreanRenderer
+    let renderer = KoreanRenderer PlainText
 
     it "renders Voidable MinorAct judgment in Korean" $ do
       let minor = PersonId "김철수"

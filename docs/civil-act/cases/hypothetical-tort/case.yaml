@@ -1,0 +1,29 @@
+title: "교통사고 + 과실상계"
+court: null
+section: "§750, §396 불법행위"
+
+identity:
+  - role: "피해자"
+    haskell: 'PersonId "피해자"'
+  - role: "가해자"
+    haskell: 'PersonId "가해자"'
+  - role: "교통사고"
+    haskell: 'ActId "교통사고"'
+
+facts:
+  - description: "가해자에게 과실 있음"
+    haskell: "tfFault = True"
+  - description: "위법성 인정"
+    haskell: "tfUnlawful = True"
+  - description: "피해자에게 손해 발생"
+    haskell: "tfDamage = True"
+  - description: "인과관계 인정"
+    haskell: "tfCausation = True"
+  - description: "피해자에게도 과실 있음 (신호위반 보행)"
+    haskell: "tfVictimNeg = True"
+
+eval: |
+  let cf = domainFact TortK (TortFacts True True True True True)
+              $ (defaultCaseFacts (PersonId "피해자") (ActId "교통사고"))
+                  { cfCounterparty = Just (PersonId "가해자") }
+  in printResults cf

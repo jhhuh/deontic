@@ -1,3 +1,5 @@
 dist-newstyle/
 .direnv/
 _site/
+site/
+result

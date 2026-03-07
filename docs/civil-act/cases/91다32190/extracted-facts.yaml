@@ -1,0 +1,49 @@
+identity:
+  - role: "증권회사 (본인, 피고)"
+    haskell: 'PersonId "securities-company"'
+  - role: "사실상 투자상담사 (무권대리인, 증권회사 직원 아님)"
+    haskell: 'PersonId "unauthorized-agent"'
+  - role: "고객/투자자 (상대방, 원고)"
+    haskell: 'PersonId "counterparty"'
+
+facts:
+  - description: "증권회사는 법인이다"
+    haskell: 'IsJuristicPerson (PersonId "securities-company")'
+    source: "증권회사의 직원 (판결요지 가)"
+
+  - description: "무권대리인이 증권회사를 대리하여 예탁금 수령 및 위탁매매계약 체결 행위를 하였다"
+    haskell: 'PerformsAct (PersonId "unauthorized-agent") (ActId "deposit-receipt-and-contract")'
+    source: "예탁금을 수령하거나 위탁매매계약을 체결 (판결요지 가)"
+
+  - description: "무권대리인에게 대리권이 없었다 (기본대리권 부정)"
+    haskell: 'Custom "NoBasicAgencyAuthority"'
+    source: "위임받은 업무는 사실행위에 불과하므로 기본대리권으로 할 수 없다 (판결요지 나)"
+
+  - description: "대리인이 권한 범위를 초과하여 행위하였다"
+    haskell: 'ExceededScope'
+    source: "권한초과의 표현대리 (판결요지 나, 민법 제126조)"
+
+  - description: "위임받은 업무(고객유치, 투자상담, 실적제고)는 사실행위에 불과하여 표현대리(제126조) 불성립"
+    haskell: 'Custom "DelegatedTasksAreMereFactualActs"'
+    source: "사실행위에 불과하므로 이를 기본대리권으로 하여서는 권한초과의 표현대리가 성립할 수 없다 (판결요지 나)"
+
+  - description: "표현대리 주장에 대해 상대방이 대리권 있다고 믿었음 (표현대리 요건으로서의 신뢰)"
+    haskell: 'IndicatedAuthority'
+    source: "민법 제126조의 표현대리 (판결요지 나)"
+
+eval: |
+  -- 핵심 쟁점: 민법 제126조 표현대리 성립 여부
+  -- 결론: 기본대리권이 사실행위에 불과하므로 표현대리 불성립
+  let cf = (defaultCaseFacts (PersonId "unauthorized-agent") (ActId "deposit-receipt-and-contract"))
+            { cfCivilFacts = Set.fromList
+                [ IsJuristicPerson (PersonId "securities-company")
+                , PerformsAct (PersonId "unauthorized-agent") (ActId "deposit-receipt-and-contract")
+                , ExceededScope
+                , IndicatedAuthority
+                , Custom "NoBasicAgencyAuthority"
+                , Custom "DelegatedTasksAreMereFactualActs"
+                ]
+            , cfCounterparty = Just (PersonId "counterparty")
+            }
+  in printResults cf
+  -- 법원 판단: 표현대리(제126조) 불성립. 기본대리권 요건 미충족.

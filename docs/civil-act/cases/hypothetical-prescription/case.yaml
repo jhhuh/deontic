@@ -1,0 +1,29 @@
+title: "소멸시효 중단"
+court: null
+section: "§162, §174 소멸시효"
+
+identity:
+  - role: "채권자"
+    haskell: 'PersonId "채권자"'
+  - role: "대여금 채권"
+    haskell: 'ActId "대여금"'
+
+facts:
+  - description: "채권 발생일: 2010-01-01"
+    haskell: "pfClaimDate = fromGregorian 2010 1 1"
+  - description: "소멸시효기간: 10년"
+    haskell: "pfPeriodYears = 10"
+  - description: "2018-01-01 채무자 일부 변제 (시효중단)"
+    haskell: "pfInterruptedOn = Just (fromGregorian 2018 1 1)"
+  - description: "소 제기: 2021-01-01"
+    haskell: "pfCurrentDate = fromGregorian 2021 1 1"
+
+eval: |
+  let cf = domainFact PrescriptionK PrescriptionFacts
+                { pfClaimDate    = fromGregorian 2010 1 1
+                , pfCurrentDate  = fromGregorian 2021 1 1
+                , pfPeriodYears  = 10
+                , pfInterruptedOn = Just (fromGregorian 2018 1 1)
+                }
+              $ defaultCaseFacts (PersonId "채권자") (ActId "대여금")
+  in printResults cf
