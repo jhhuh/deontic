@@ -62,6 +62,10 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
   Deontic.Civil.DefaultObligation -- §387-390 채무불이행 (breach + creditor defense)
   Deontic.Civil.SaleWarranty     -- §580-582 하자담보책임 (defect + buyer knowledge)
   Deontic.Civil.Lease            -- §618-640 임대차 (obligation + implicit renewal)
+  Deontic.Civil.AgencyRemedies   -- §134-135 대리 철회·책임 (counterparty knowledge)
+  Deontic.Civil.Invalidity       -- §137-139 일부무효·전환·추인 (meta-rules on void acts)
+  Deontic.Civil.Cancellation     -- §141-145 취소·추인 (wrapper pattern on prior verdict)
+  Deontic.Civil.ConditionalAct   -- §147-152 조건부 법률행위 (recursive query for §150)
   Deontic.Civil.Render           -- KoreanRenderer (Judgment → 판결문)
 ```
 
@@ -100,6 +104,18 @@ deontic-kr-civil/                -- Korean Civil Act (민법) encoding
 | §618 임대차 | `LeaseAct` | `'[RenewalRight, Base]` | Lease validity and expiration |
 | §639 묵시적 갱신 | `LeaseAct` | (same stack) | Implicit renewal: continued use + no objection |
 | §640 차임연체 해지 | `LeaseAct` | (same stack) | 2-period rent arrears → termination |
+| §134 상대방의 철회권 | `AgencyWithdrawalAct` | `'[CounterpartyKnowledge, Base]` | Counterparty may withdraw; not if knew of no authority |
+| §135 무권대리인의 책임 | `AgentLiabilityAct` | `'[Proviso, Base]` | Agent liable; not if counterparty knew or agent limited-capacity |
+| §137 일부무효 | `PartialInvalidityAct` | `'[Conversion, HypotheticalIntent, Base]` | Part void → whole void; hypothetical intent saves |
+| §138 무효행위의 전환 | `PartialInvalidityAct` | (same stack) | Void act converts to valid if meets other act's requirements |
+| §139 무효행위의 추인 | `PartialInvalidityAct` | (same stack) | Ratification with knowledge of defect → Valid |
+| §141 취소의 효과 | `CancellableAct` | `'[ConstructiveRatification, GeneralRatification, Base]` | Wrapper: takes prior Verdict; cancelled Voidable → Void |
+| §143-144 취소할 수 있는 행위의 추인 | `CancellableAct` | (same stack) | Ratification after cause ceases → Valid |
+| §145 법정추인 | `CancellableAct` | (same stack) | Constructive ratification events → Valid |
+| §147 조건부 법률행위 | `ConditionalAct` | `'[BadFaithCondition, IllegalCondition, Base]` | Suspensive/resolutive condition effects |
+| §150 반신의행위 | `ConditionalAct` | (same stack) | Bad faith prevention → deemed fulfilled (recursive query) |
+| §151 불법조건 | `ConditionalAct` | (same stack) | Illegal condition → Void; impossible condition truth table |
+| §152 기한 | `ConditionalAct` | (same stack) | Start/end date effects on act validity |
 | **BGB (German)** | | | |
 | §104 Geschäftsunfähigkeit | `CapacityAct` | `'[SpecialRule, Proviso, Base]` | Under 7 or permanently incapable → Void |
 | §106 beschränkte Geschäftsfähigkeit | `CapacityAct` | (same stack) | Minor without consent → Voidable |
@@ -166,6 +182,11 @@ Layers are composable building blocks, not hardcoded to a specific stack.
 **Heterogeneous fact types.** The `Facts` type family lets each act type define its own fact structure. `MinorAct` uses `Set CivilFact` (boolean facts), while `PrescriptionAct` uses `PrescriptionFacts` (a record with `Day` fields for temporal reasoning). The core framework doesn't care — it just threads `Facts act` through.
 
 **Calendar year computation (§157).** All temporal modules use `Data.Time.Day` with `addGregorianYearsClip` for proper calendar year arithmetic per §157 ("기간을 연으로 정한 때에는 역에 의하여 계산한다"). This correctly handles leap years — `2020-02-29 + 1년 = 2021-02-28`.
+
+**Second-order patterns.** Some legal rules operate not on facts but on the *output of other legal evaluations*. Two second-order patterns emerge:
+
+- **Wrapper pattern** (`CancellableAct`): Takes a prior `Verdict` as an input field. The cancellation/ratification meta-rules (§141-145) operate on the result of a previous `query` call, keeping the base validity question decoupled from the meta-question.
+- **Deemed fulfillment** (`ConditionalAct`, §150): An `Adjudicate` instance calls `query` recursively with modified facts — a counterfactual ("what if the condition were fulfilled?"). Setting `condBadFaith = Nothing` removes the recursion trigger, bounding depth to exactly 1. This is a convention, not a compile-time guarantee; see [patterns catalog](docs/civil-act/patterns.md) for the full safety analysis.
 
 ## Prior Art
 

@@ -143,6 +143,92 @@ The override requires a conjunction of multiple conditions.
 
 All four conditions must hold simultaneously.
 
+## Pattern 9: Wrapper Pattern (Second-Order Verdict)
+
+**Structure:** `'[ConstructiveRatification, GeneralRatification, Base]`
+
+A **second-order** use of the framework: the act type takes a prior `Verdict`
+(output of a previous `query` call) as an input field. This enables meta-rules
+that operate on the result of other legal evaluations.
+
+**Example:** §141-145 취소 (CancellableAct)
+
+```haskell
+data CancellableAct = CancellableAct
+  { caActId        :: ActId
+  , caPriorVerdict :: Verdict   -- ← output of a previous query
+  }
+```
+
+The Base layer inspects `caPriorVerdict`:
+
+```haskell
+instance Adjudicate CancellableAct '[Base] where
+  adjudicate act facts
+    | caPriorVerdict act /= Voidable = JBase (caPriorVerdict act) ...
+    --  ^ non-voidable acts pass through unchanged
+    | cnfCancelled facts = JBase Void ...
+    | otherwise          = JBase Voidable ...
+```
+
+Override layers then apply ratification rules (§143 general, §145 constructive)
+that can restore a cancelled-Void back to Valid.
+
+!!! note "Why a wrapper, not a combined stack?"
+    The base validity question ("is this act voidable?") and the cancellation
+    meta-question ("was the voidable act cancelled or ratified?") are
+    **separate legal evaluations**. The wrapper pattern keeps them decoupled —
+    you can swap out the inner evaluation without touching the cancellation logic.
+
+## Pattern 10: Deemed Fulfillment (Recursive Query)
+
+**Structure:** `'[BadFaithCondition, IllegalCondition, Base]`
+
+The most sophisticated pattern: an `Adjudicate` instance calls `query`
+recursively with **modified facts** to evaluate a counterfactual scenario.
+This encodes §150 (반신의행위) — if a party prevents a condition from being
+fulfilled in bad faith, the condition is **deemed fulfilled**.
+
+**Example:** §150 반신의행위 (ConditionalAct)
+
+```haskell
+instance Adjudicate ConditionalAct rest
+      => Adjudicate ConditionalAct (BadFaithCondition ': rest) where
+  adjudicate act facts = case condBadFaith facts of
+    Just BadFaithPrevention ->
+      let deemedFacts = facts { condState = CondFulfilled
+                              , condBadFaith = Nothing }  -- ← removes trigger
+          deemedResult = query act deemedFacts             -- ← recursive query
+      in JOverride (adjudicate @_ @rest act facts)
+                   (verdict deemedResult) ...
+    Nothing -> JDelegate (adjudicate @_ @rest act facts)
+```
+
+The recursive `query` re-evaluates the act as if the condition were fulfilled,
+then uses that counterfactual verdict as the override verdict.
+
+### Safety Analysis
+
+**Is the recursive `query` safe?** Yes, with a caveat:
+
+1. **Termination guarantee:** Setting `condBadFaith = Nothing` removes the only
+   trigger for the `BadFaithCondition` layer. On re-entry, `Nothing` matches
+   the catch-all → `JDelegate` → no further recursion. Maximum depth: **1**.
+
+2. **No shared state:** `query` is pure — no mutation, no side effects. The
+   modified facts are a local copy.
+
+3. **Fragility risk:** The termination guarantee is a **convention**, not a
+   compile-time invariant. A future developer adding a new trigger to
+   `BadFaithCondition` could break the depth bound. Consider:
+    - Documenting the recursion contract in the module
+    - Adding a depth counter to `ConditionalFacts` as a safety net (not currently needed)
+
+!!! warning "Not infinitely composable"
+    Unlike Patterns 1-8, this pattern does **not** compose arbitrarily. Nesting
+    two recursive-query patterns could create mutual recursion. Currently safe
+    because `ConditionalAct` is the only act type using this pattern.
+
 ## Pattern Composition
 
 These patterns compose naturally. A multi-issue case study might combine:
