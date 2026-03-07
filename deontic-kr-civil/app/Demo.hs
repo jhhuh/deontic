@@ -35,34 +35,32 @@ main = do
       { cfCivilFacts = Set.singleton GrossNegligence }
 
   runCase "Case 4: 시효중단 (대법원 93다47745)"
-    (defaultCaseFacts (PersonId "채권자") (ActId "대여금"))
-      { cfPrescription = Just PrescriptionFacts
+    $ domainFact PrescriptionK PrescriptionFacts
           { pfClaimDate    = fromGregorian 2010 1 1
           , pfCurrentDate  = fromGregorian 2021 1 1
           , pfPeriodYears  = 10
           , pfInterruptedOn = Just (fromGregorian 2018 1 1)
           }
-      }
+    $ defaultCaseFacts (PersonId "채권자") (ActId "대여금")
 
   runCase "Case 5: 교통사고 + 과실상계"
-    (defaultCaseFacts (PersonId "피해자") (ActId "교통사고"))
-      { cfCounterparty = Just (PersonId "가해자")
-      , cfTort = Just (TortFacts True True True True True)
-      }
+    $ domainFact TortK (TortFacts True True True True True)
+    $ (defaultCaseFacts (PersonId "피해자") (ActId "교통사고"))
+      { cfCounterparty = Just (PersonId "가해자") }
 
   runCase "Case 6: 복합 쟁점 — 미성년자 무권대리 사기매매"
-    (defaultCaseFacts (PersonId "갑") (ActId "토지매매"))
-      { cfCounterparty = Just (PersonId "을")
-      , cfCivilFacts = Set.fromList
-          [ IsMinor (PersonId "갑")
-          , ThirdPartyFraud
-          ]
-      , cfPrescription = Just PrescriptionFacts
+    $ domainFact PrescriptionK PrescriptionFacts
           { pfClaimDate    = fromGregorian 2005 1 1
           , pfCurrentDate  = fromGregorian 2018 6 1
           , pfPeriodYears  = 10
           , pfInterruptedOn = Nothing
           }
+    $ (defaultCaseFacts (PersonId "갑") (ActId "토지매매"))
+      { cfCounterparty = Just (PersonId "을")
+      , cfCivilFacts = Set.fromList
+          [ IsMinor (PersonId "갑")
+          , ThirdPartyFraud
+          ]
       }
 
   runCase "Case 7: 제3자 사기 + 상대방 선의 (대법원 98다60828)"
@@ -100,18 +98,6 @@ runCase title cf = do
   if Set.null (cfCivilFacts cf)
     then putStrLn "  사실관계: (없음)"
     else mapM_ (\f -> putStrLn $ "  • " ++ show f) (Set.toList (cfCivilFacts cf))
-  case cfPrescription cf of
-    Just pf -> do
-      putStrLn $ "  시효: " ++ show (pfPeriodYears pf) ++ "년"
-      putStrLn $ "    발생일: " ++ show (pfClaimDate pf)
-      putStrLn $ "    판단일: " ++ show (pfCurrentDate pf)
-      case pfInterruptedOn pf of
-        Just d  -> putStrLn $ "    중단일: " ++ show d
-        Nothing -> pure ()
-    Nothing -> pure ()
-  case cfTort cf of
-    Just tf -> putStrLn $ "  불법행위: " ++ show tf
-    Nothing -> pure ()
   putStrLn ""
 
   let results = evaluateAll cf

@@ -33,6 +33,9 @@ library
     base       >= 4.17 && < 5,
     deontic-core,
     containers >= 0.6,
+    dependent-map >= 0.4,
+    dependent-sum >= 0.7,
+    some       >= 1.0,
     text       >= 2.0,
     time       >= 1.11
   default-language: GHC2021

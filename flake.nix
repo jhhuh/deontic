@@ -68,9 +68,9 @@
         default = mkdocs-site;
       };
 
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
-          ghc
+      devShells.${system}.default = hpkgs.shellFor {
+        packages = p: [ deontic-core deontic-kr-civil deontic-de-bgb ];
+        nativeBuildInputs = [
           hpkgs.cabal-install
           hpkgs.hspec-discover
           hpkgs.haskell-language-server

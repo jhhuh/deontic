@@ -9,11 +9,14 @@ module Deontic.Civil.Evaluate
   , CaseResult(..)
   , evaluateAll
   , defaultCaseFacts
+  , domainFact
   ) where
 
+import Data.Functor.Identity (Identity(..))
 import Data.Maybe (catMaybes)
 import Data.Text (Text)
 import qualified Data.Set as Set
+import qualified Data.Dependent.Map as DMap
 
 import Deontic.Core.Types (PersonId, ActId, ArticleRef(..))
 import Deontic.Core.Verdict
@@ -43,46 +46,33 @@ import Deontic.Civil.ConditionalAct ()
 -- | Unified case facts. The omnibus input to 'evaluateAll'.
 --
 -- Boolean/flag facts go in 'cfCivilFacts'. Structured facts for
--- domain-specific act types are optional — only provided when
--- the case involves that legal issue.
+-- domain-specific act types are stored in a 'DMap.DMap' keyed by
+-- 'DomainKey' — only provided when the case involves that legal issue.
 data CaseFacts = CaseFacts
   { cfActor        :: PersonId          -- ^ 행위자/표의자
   , cfCounterparty :: Maybe PersonId    -- ^ 상대방 (agency, tort)
   , cfActId        :: ActId             -- ^ 행위 식별자
   , cfCivilFacts   :: Set.Set CivilFact -- ^ Boolean/flag facts
-  -- Domain-specific structured facts (Nothing = not applicable)
-  , cfPrescription :: Maybe PrescriptionFacts
-  , cfTort         :: Maybe TortFacts
-  , cfCoOwnership  :: Maybe CoOwnershipFacts
-  , cfRescission   :: Maybe RescissionFacts
-  , cfAcqPresc     :: Maybe AcqPrescFacts
-  , cfDefault      :: Maybe DefaultFacts
-  , cfWarranty     :: Maybe WarrantyFacts
-  , cfLease        :: Maybe LeaseFacts
-  , cfInvalidity   :: Maybe PartialInvalidityFacts
-  , cfCancellation :: Maybe CancellationFacts
-  , cfConditional  :: Maybe ConditionalFacts
-  } deriving (Eq, Show)
+  , cfDomainFacts  :: DMap.DMap DomainKey Identity
+  }
 
--- | Convenience constructor with all optional fields set to Nothing.
+-- | Convenience constructor with all optional fields empty.
 defaultCaseFacts :: PersonId -> ActId -> CaseFacts
 defaultCaseFacts actor actId = CaseFacts
   { cfActor        = actor
   , cfCounterparty = Nothing
   , cfActId        = actId
   , cfCivilFacts   = Set.empty
-  , cfPrescription = Nothing
-  , cfTort         = Nothing
-  , cfCoOwnership  = Nothing
-  , cfRescission   = Nothing
-  , cfAcqPresc     = Nothing
-  , cfDefault      = Nothing
-  , cfWarranty     = Nothing
-  , cfLease        = Nothing
-  , cfInvalidity   = Nothing
-  , cfCancellation = Nothing
-  , cfConditional  = Nothing
+  , cfDomainFacts  = DMap.empty
   }
+
+-- | Insert a domain-specific fact record into a 'CaseFacts'.
+domainFact :: DomainKey a -> a -> CaseFacts -> CaseFacts
+domainFact k v cf = cf { cfDomainFacts = DMap.insert k (Identity v) (cfDomainFacts cf) }
+
+-- | Look up a domain fact.
+lookupDomain :: DomainKey a -> CaseFacts -> Maybe a
+lookupDomain k cf = runIdentity <$> DMap.lookup k (cfDomainFacts cf)
 
 -- | A single evaluation result.
 data CaseResult = CaseResult
@@ -108,10 +98,6 @@ evaluateAll cf = filter (not . isTriviallyValid) $ catMaybes
       $ cr "법률행위 (§103-107)"
       (query (JuristicAct (cfActor cf) (cfActId cf)) (cfCivilFacts cf))
   -- ShamAct: always Void, only relevant if explicitly indicated
-  -- (通정허위표시 is determined by fact investigation, not a CivilFact flag)
-  -- We use BonaFideThirdParty as the trigger — if present, sham is at issue
-  -- Also: if NO other triggers fire, sham might be the issue → needs explicit opt-in
-  -- For now: include when BonaFideThirdParty OR no specific triggers
   , guarded (BonaFideThirdParty `Set.member` cfCivilFacts cf)
       $ cr "통정허위표시 (§108)"
       (query (ShamAct (cfActor cf) (cfActId cf)) (cfCivilFacts cf))
@@ -151,34 +137,34 @@ evaluateAll cf = filter (not . isTriviallyValid) $ catMaybes
   -- ── Domain-record act types (run only when facts provided) ──
   , fmap (\pf -> cr "소멸시효 (§162)"
       (query (PrescriptionAct (cfActor cf) (cfActId cf)) pf))
-      (cfPrescription cf)
+      (lookupDomain PrescriptionK cf)
   , fmap (\tf -> cr "불법행위 (§750, §396)"
       (query (TortAct (cfActor cf) (agent cf) (cfActId cf)) tf))
-      (cfTort cf)
+      (lookupDomain TortK cf)
   , fmap (\cof -> cr "공유물의 처분 (§264)"
       (query (CoOwnershipAct (cfActId cf)) cof))
-      (cfCoOwnership cf)
+      (lookupDomain CoOwnershipK cf)
   , fmap (\rf -> cr "취소의 제척기간 (§146)"
       (query (RescissionAct (cfActor cf) (cfActId cf)) rf))
-      (cfRescission cf)
+      (lookupDomain RescissionK cf)
   , fmap (\apf -> cr "취득시효 (§245)"
       (query (AcqPrescriptionAct (cfActor cf) (cfActId cf)) apf))
-      (cfAcqPresc cf)
+      (lookupDomain AcqPrescK cf)
   , fmap (\df -> cr "채무불이행 (§387-390)"
       (query (DefaultAct (cfActor cf) (agent cf) (cfActId cf)) df))
-      (cfDefault cf)
+      (lookupDomain DefaultK cf)
   , fmap (\wf -> cr "하자담보 (§580-582)"
       (query (WarrantyAct (cfActor cf) (cfActId cf)) wf))
-      (cfWarranty cf)
+      (lookupDomain WarrantyK cf)
   , fmap (\lf -> cr "임대차 (§618-640)"
       (query (LeaseAct (cfActor cf) (agent cf) (cfActId cf)) lf))
-      (cfLease cf)
+      (lookupDomain LeaseK cf)
   , fmap (\pif -> cr "일부무효/전환/추인 (§137-139)"
       (query (PartialInvalidityAct (cfActId cf)) pif))
-      (cfInvalidity cf)
+      (lookupDomain InvalidityK cf)
   , fmap (\cnf -> cr "조건부 법률행위 (§147-152)"
       (query (ConditionalAct (cfActId cf)) cnf))
-      (cfConditional cf)
+      (lookupDomain ConditionalK cf)
   ]
   where
     agent cf' = maybe (cfActor cf') id (cfCounterparty cf')

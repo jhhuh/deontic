@@ -75,7 +75,8 @@
 -- = Fact Type Strategy
 --
 -- * @Set CivilFact@ — for boolean\/flag-based facts (§5, §103-110, §114-132, §186-188, §197-200)
--- * Domain records — for structured facts: 'PrescriptionFacts', 'RescissionFacts',
+-- * Domain records — stored in @DMap DomainKey Identity@ (from @dependent-map@),
+--   keyed by 'DomainKey' GADT: 'PrescriptionFacts', 'RescissionFacts',
 --   'AcqPrescFacts', 'DefaultFacts', 'WarrantyFacts', 'LeaseFacts', 'CoOwnershipFacts', 'TortFacts',
 --   'PartialInvalidityFacts', 'CancellationFacts', 'ConditionalFacts'
 --

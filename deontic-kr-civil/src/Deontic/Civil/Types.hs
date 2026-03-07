@@ -53,11 +53,16 @@ module Deontic.Civil.Types
   , HypotheticalIntent, Conversion
   , GeneralRatification, ConstructiveRatification
   , IllegalCondition, BadFaithCondition
+  , DomainKey(..)
   , module Data.Time.Calendar
   ) where
 
+import Data.Functor.Identity (Identity(..))
+import Data.GADT.Compare (GEq(..), GCompare(..), GOrdering(..))
+import Data.GADT.Show (GShow(..))
 import Data.Set (Set)
 import Data.Time.Calendar (Day, addGregorianYearsClip)
+import Data.Type.Equality ((:~:)(..))
 import Deontic.Core.Types (PersonId, ActId, Facts)
 import Deontic.Core.Verdict (Verdict)
 
@@ -448,3 +453,66 @@ type instance Facts AgentLiabilityAct     = Set CivilFact
 type instance Facts PartialInvalidityAct  = PartialInvalidityFacts
 type instance Facts CancellableAct        = CancellationFacts
 type instance Facts ConditionalAct        = ConditionalFacts
+
+-- | Heterogeneous key for domain-specific fact records.
+-- Each constructor determines the value type in the 'DMap'.
+data DomainKey a where
+  PrescriptionK :: DomainKey PrescriptionFacts
+  TortK         :: DomainKey TortFacts
+  CoOwnershipK  :: DomainKey CoOwnershipFacts
+  RescissionK   :: DomainKey RescissionFacts
+  AcqPrescK     :: DomainKey AcqPrescFacts
+  DefaultK      :: DomainKey DefaultFacts
+  WarrantyK     :: DomainKey WarrantyFacts
+  LeaseK        :: DomainKey LeaseFacts
+  InvalidityK   :: DomainKey PartialInvalidityFacts
+  CancellationK :: DomainKey CancellationFacts
+  ConditionalK  :: DomainKey ConditionalFacts
+
+domainKeyTag :: DomainKey a -> Int
+domainKeyTag PrescriptionK = 0
+domainKeyTag TortK         = 1
+domainKeyTag CoOwnershipK  = 2
+domainKeyTag RescissionK   = 3
+domainKeyTag AcqPrescK     = 4
+domainKeyTag DefaultK      = 5
+domainKeyTag WarrantyK     = 6
+domainKeyTag LeaseK        = 7
+domainKeyTag InvalidityK   = 8
+domainKeyTag CancellationK = 9
+domainKeyTag ConditionalK  = 10
+
+instance GEq DomainKey where
+  geq PrescriptionK PrescriptionK = Just Refl
+  geq TortK         TortK         = Just Refl
+  geq CoOwnershipK  CoOwnershipK  = Just Refl
+  geq RescissionK   RescissionK   = Just Refl
+  geq AcqPrescK     AcqPrescK     = Just Refl
+  geq DefaultK      DefaultK      = Just Refl
+  geq WarrantyK     WarrantyK     = Just Refl
+  geq LeaseK        LeaseK        = Just Refl
+  geq InvalidityK   InvalidityK   = Just Refl
+  geq CancellationK CancellationK = Just Refl
+  geq ConditionalK  ConditionalK  = Just Refl
+  geq _             _             = Nothing
+
+instance GShow DomainKey where
+  gshowsPrec _ PrescriptionK = showString "PrescriptionK"
+  gshowsPrec _ TortK         = showString "TortK"
+  gshowsPrec _ CoOwnershipK  = showString "CoOwnershipK"
+  gshowsPrec _ RescissionK   = showString "RescissionK"
+  gshowsPrec _ AcqPrescK     = showString "AcqPrescK"
+  gshowsPrec _ DefaultK      = showString "DefaultK"
+  gshowsPrec _ WarrantyK     = showString "WarrantyK"
+  gshowsPrec _ LeaseK        = showString "LeaseK"
+  gshowsPrec _ InvalidityK   = showString "InvalidityK"
+  gshowsPrec _ CancellationK = showString "CancellationK"
+  gshowsPrec _ ConditionalK  = showString "ConditionalK"
+
+instance GCompare DomainKey where
+  gcompare a b = case compare (domainKeyTag a) (domainKeyTag b) of
+    LT -> GLT
+    GT -> GGT
+    EQ -> case geq a b of
+      Just Refl -> GEQ
+      Nothing   -> error "DomainKey: tag collision (impossible)"
