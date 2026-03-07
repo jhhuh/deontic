@@ -2,7 +2,7 @@
 -- | Omnibus evaluator: runs all act types against a unified set of facts.
 --
 -- Given a 'CaseFacts', 'evaluateAll' constructs every applicable act type,
--- queries the framework, and returns non-trivial results. The only human
+-- queries the framework, and returns all relevant results. The only human
 -- input is the fact mapping; everything else is mechanical.
 module Deontic.Civil.Evaluate
   ( CaseFacts(..)
@@ -19,9 +19,7 @@ import qualified Data.Set as Set
 import qualified Data.Dependent.Map as DMap
 
 import Deontic.Core.Types (PersonId, ActId, ArticleRef(..))
-import Deontic.Core.Verdict
 import Deontic.Core.Adjudicate
-import Deontic.Render (judgmentSteps, Step(..), StepKind(..))
 import Deontic.Civil.Types
 
 -- Bring instances into scope
@@ -81,14 +79,16 @@ data CaseResult = CaseResult
   }
 
 -- | Run all act types against the case facts.
--- Returns only non-trivial results (see 'isTriviallyValid').
+-- Returns all results for relevant (guarded) act types, including
+-- trivially valid ones — so the output shows every act type that was
+-- checked, not just those with non-trivial verdicts.
 --
 -- Act types with unconditional base verdicts (ShamAct → always Void,
 -- MistakeAct → always Voidable, etc.) require a trigger fact to be
 -- present, because selecting that act type IS the relevant fact in the
 -- real legal analysis.
 evaluateAll :: CaseFacts -> [CaseResult]
-evaluateAll cf = filter (not . isTriviallyValid) $ catMaybes
+evaluateAll cf = catMaybes
   -- ── Set CivilFact act types ──
   -- MinorAct: relevant if IsMinor is present
   [ guarded (anyMinor (cfCivilFacts cf)) $ cr "미성년자 (§5)"
@@ -169,16 +169,6 @@ evaluateAll cf = filter (not . isTriviallyValid) $ catMaybes
   where
     agent cf' = maybe (cfActor cf') id (cfCounterparty cf')
     cr label j = CaseResult label (SomeJudgment j)
-
--- | A judgment is trivially Valid if:
--- 1. The final verdict is Valid, AND
--- 2. No override occurred (only Applied/Delegated steps)
---
--- This filters out act types that are simply not relevant to the case.
--- A Valid verdict reached via override (e.g., §5 단서) is non-trivial.
-isTriviallyValid :: CaseResult -> Bool
-isTriviallyValid (CaseResult _ (SomeJudgment j)) =
-  verdict j == Valid && all (\s -> stepKind s /= Overridden) (judgmentSteps j)
 
 -- | Guard: include result only if condition is True.
 guarded :: Bool -> CaseResult -> Maybe CaseResult

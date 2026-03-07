@@ -50,7 +50,7 @@ resultsBlocks :: CaseFacts -> [Block]
 resultsBlocks cf =
   let results = evaluateAll cf
   in if null results
-     then [Para (Plain "(모든 쟁점에서 사안과 무관한 것으로 판단됨)")]
+     then [Para (Plain "(해당 사안에 관련된 쟁점 없음)")]
      else concatMap resultBlocks results
           ++ case results of
                [_] -> []
