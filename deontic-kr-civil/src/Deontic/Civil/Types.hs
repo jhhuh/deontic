@@ -37,12 +37,29 @@ module Deontic.Civil.Types
   , CreditorDefense
   , BuyerKnowledge
   , RenewalRight
+  , AgencyWithdrawalAct(..)
+  , AgentLiabilityAct(..)
+  , PartialInvalidityAct(..)
+  , PartialInvalidityFacts(..)
+  , CancellableAct(..)
+  , CancellationFacts(..)
+  , ConstructiveRatificationEvent(..)
+  , ConditionalAct(..)
+  , ConditionType(..)
+  , ConditionState(..)
+  , BadFaithKind(..)
+  , ConditionalFacts(..)
+  , CounterpartyKnowledge
+  , HypotheticalIntent, Conversion
+  , GeneralRatification, ConstructiveRatification
+  , IllegalCondition, BadFaithCondition
   , module Data.Time.Calendar
   ) where
 
 import Data.Set (Set)
 import Data.Time.Calendar (Day, addGregorianYearsClip)
 import Deontic.Core.Types (PersonId, ActId, Facts)
+import Deontic.Core.Verdict (Verdict)
 
 -- | 미성년자의 법률행위 (민법 제5조)
 data MinorAct = MinorAct
@@ -168,6 +185,21 @@ data BuyerKnowledge    -- §580② 매수인 악의·과실
 -- Layer tokens for lease (임대차)
 data RenewalRight      -- §639 묵시적 갱신
 
+-- Layer tokens for agency remedies (무권대리 구제)
+data CounterpartyKnowledge  -- §134 상대방의 악의
+
+-- Layer tokens for partial invalidity (일부무효)
+data HypotheticalIntent     -- §137 단서 가정적 의사
+data Conversion             -- §138 무효행위의 전환
+
+-- Layer tokens for cancellation (취소/추인)
+data GeneralRatification       -- §143 추인
+data ConstructiveRatification  -- §145 법정추인
+
+-- Layer tokens for conditional acts (조건부 법률행위)
+data IllegalCondition    -- §151 불법조건/기성조건
+data BadFaithCondition   -- §150 반신의행위
+
 -- | 취소의 제척기간 (민법 제146조)
 data RescissionAct = RescissionAct
   { raActor :: PersonId
@@ -253,6 +285,95 @@ data LeaseFacts = LeaseFacts
   , lfTwoRentsLate   :: Bool  -- 2기의 차임 연체 (§640)
   } deriving (Eq, Show)
 
+-- | 상대방의 철회권 (민법 제134조)
+data AgencyWithdrawalAct = AgencyWithdrawalAct
+  { awPrincipal    :: PersonId
+  , awCounterparty :: PersonId
+  , awActId        :: ActId
+  } deriving (Eq, Show)
+
+-- | 무권대리인의 책임 (민법 제135조)
+data AgentLiabilityAct = AgentLiabilityAct
+  { alAgent        :: PersonId
+  , alCounterparty :: PersonId
+  , alActId        :: ActId
+  } deriving (Eq, Show)
+
+-- | 법률행위의 일부무효/전환/추인 (민법 제137조-제139조)
+data PartialInvalidityAct = PartialInvalidityAct
+  { piActId :: ActId
+  } deriving (Eq, Show)
+
+-- | 일부무효 판단에 필요한 사실관계
+data PartialInvalidityFacts = PartialInvalidityFacts
+  { pifPartVoid              :: Bool  -- 일부분이 무효
+  , pifHypotheticalIntent    :: Bool  -- 무효부분 없이도 행위했을 것 (§137 단서)
+  , pifMeetsOtherReqs        :: Bool  -- 다른 법률행위 요건 구비 (§138)
+  , pifConversionIntent      :: Bool  -- 다른 행위를 의욕 (§138)
+  , pifRatifiedWithKnowledge :: Bool  -- 무효 알고 추인 (§139)
+  } deriving (Eq, Show)
+
+-- | 취소할 수 있는 행위의 취소/추인 (민법 제141조, 제143조-제145조)
+-- 다른 act type의 query 결과(Verdict)를 입력으로 받는 wrapper pattern.
+data CancellableAct = CancellableAct
+  { caActId        :: ActId
+  , caPriorVerdict :: Verdict
+  } deriving (Eq, Show)
+
+-- | 취소/추인 판단에 필요한 사실관계
+data CancellationFacts = CancellationFacts
+  { cnfCancelled          :: Bool
+  , cnfRatified           :: Bool
+  , cnfCauseCeased        :: Bool
+  , cnfRatifierIsGuardian :: Bool
+  , cnfConstructive       :: Maybe ConstructiveRatificationEvent
+  , cnfObjectionReserved  :: Bool
+  } deriving (Eq, Show)
+
+-- | 법정추인 사유 (민법 제145조)
+data ConstructiveRatificationEvent
+  = FullOrPartialPerformance
+  | DemandForPerformance
+  | Novation
+  | SecurityProvision
+  | RightAssignment
+  | CompulsoryExecution
+  deriving (Eq, Ord, Show)
+
+-- | 조건부/기한부 법률행위 (민법 제147조, 제150조-제152조)
+data ConditionalAct = ConditionalAct
+  { condActId :: ActId
+  } deriving (Eq, Show)
+
+-- | 조건의 유형
+data ConditionType
+  = Suspensive  -- 정지조건 (§147①)
+  | Resolutive  -- 해제조건 (§147②)
+  | StartDate   -- 시기 (§152①)
+  | EndDate     -- 종기 (§152②)
+  deriving (Eq, Ord, Show)
+
+-- | 조건의 상태
+data ConditionState
+  = CondPending     -- 미성취
+  | CondFulfilled   -- 성취
+  | CondImpossible  -- 성취 불가능
+  | CondIllegal     -- 불법조건
+  deriving (Eq, Ord, Show)
+
+-- | 반신의행위의 유형 (민법 제150조)
+data BadFaithKind
+  = BadFaithPrevention  -- 조건 성취 방해 (§150①)
+  | BadFaithCausation   -- 조건 성취 야기 (§150②)
+  deriving (Eq, Ord, Show)
+
+-- | 조건부 법률행위 판단에 필요한 사실관계
+data ConditionalFacts = ConditionalFacts
+  { condType     :: ConditionType
+  , condState    :: ConditionState
+  , condBadFaith :: Maybe BadFaithKind
+  } deriving (Eq, Show)
+
 -- | 민법 사실관계 (Korean Civil Act facts)
 data CivilFact
   -- 인적 사항
@@ -286,6 +407,9 @@ data CivilFact
   | AuthorityExpired           -- §129 대리권 소멸
   -- §130, §132 무권대리
   | Ratified                   -- 추인
+  | CounterpartyKnewNoAuthority  -- §134 상대방이 대리권 없음을 안 때
+  | AgentIsLimitedCapacity       -- §135② 대리인이 제한능력자
+  | CounterpartyCouldHaveKnown   -- §135② 상대방이 알 수 있었을 때
   -- §197, §200 점유 추정의 반증
   | BadFaith                   -- 악의 (반증: §197)
   | ViolentPossession          -- 강폭 점유 (반증: §197)
@@ -319,3 +443,8 @@ type instance Facts AcqPrescriptionAct  = AcqPrescFacts
 type instance Facts DefaultAct       = DefaultFacts
 type instance Facts WarrantyAct      = WarrantyFacts
 type instance Facts LeaseAct         = LeaseFacts
+type instance Facts AgencyWithdrawalAct   = Set CivilFact
+type instance Facts AgentLiabilityAct     = Set CivilFact
+type instance Facts PartialInvalidityAct  = PartialInvalidityFacts
+type instance Facts CancellableAct        = CancellationFacts
+type instance Facts ConditionalAct        = ConditionalFacts
