@@ -616,7 +616,7 @@ these constraints:
 
 - **Model**: Claude (claude-opus-4-6 via Claude Code Agent tool)
 - **Context provided**: None — only `fulltext.md` and `framework-output.md`
-- **Directive**: [`scripts/directives/verify-match.md`](../../scripts/directives/verify-match.md)
+- **Directive**: [`scripts/directives/verify-match.md`](https://github.com/jhhuh/deontic/blob/master/scripts/directives/verify-match.md)
 
 The subagent has no knowledge of the project architecture, Haskell code,
 or any other case. It reads only the two specified files and outputs a

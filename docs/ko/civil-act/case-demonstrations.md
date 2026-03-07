@@ -615,7 +615,7 @@ JDelegate :: Judgment prev → Judgment (l ': prev)
 
 - **모델(Model)**: Claude (claude-opus-4-6 via Claude Code Agent tool)
 - **제공되는 맥락(Context)**: 없음 — `fulltext.md`와 `framework-output.md`만 제공
-- **지시문(Directive)**: [`scripts/directives/verify-match.md`](../../scripts/directives/verify-match.md)
+- **지시문(Directive)**: [`scripts/directives/verify-match.md`](https://github.com/jhhuh/deontic/blob/master/scripts/directives/verify-match.md)
 
 하위 에이전트는 프로젝트 구조, Haskell 코드, 또는 다른 사례에 대한 사전 지식이
 없습니다. 지정된 두 파일만 읽고 YAML 형식의 판정 결과를 출력합니다.
