@@ -48,25 +48,91 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 """
 
 PIPELINE = """\
----
-
 ## Pipeline Summary
 
 ```
-  인정사실 (자연어)
+  Recognized facts (natural language)
       │
-      │  ← 인간/LLM 판단 (유일한 비기계적 단계)
+      │  ← Human/LLM judgment (the only non-mechanical step)
       ▼
-  Identity + Fact Translation (위 표)
+  Identity + Fact Translation (tables above)
       │
-      │  ← 순수 기계적 (evaluateAll + renderJudgment)
+      │  ← Purely mechanical (evaluateAll + renderJudgment)
       ▼
-  프레임워크 판결문 (위 표 우측 열)
+  Framework output (right column above)
       │
-      │  ← LLM 서브에이전트 (고정 지시문, 무맥락)
+      │  ← LLM subagent (fixed directive, zero context)
       ▼
-  실제 판결문과의 일치도 판정 (match.yaml)
+  Match verification (match.yaml)
 ```
+"""
+
+ANALYSIS = """\
+---
+
+## Analysis: Current Limitations and Extensibility
+
+### Current State
+
+Across 6 Supreme Court cases, the framework accurately encodes **statutory
+text** (조문) but does not yet reflect **case-law doctrines** (판례법리)
+— judge-made exceptions established through precedent.
+
+| Case | Match | Missing doctrine |
+|:-----|:------|:-----------------|
+| 2005다71659 | ⚠️ partial | Reasoning chain for §6 implied consent (처분허락) |
+| 94다12074 | ⚠️ partial | Conditional judgment pending fact-finding (선의 여부) |
+| 2013다49794 | ⚠️ partial | Counterparty exploitation defeats gross-negligence bar (§109 판례법리) |
+| 2019다280375 | ❌ mismatch | Registration chain validity analysis (등기법 layer) |
+| 98다60828 | ❌ mismatch | Agent identifiable with counterparty ≠ third party (§110②) |
+| 91다32190 | ❌ mismatch | Factual-act delegation ≠ basic agency authority (§126 prerequisite) |
+
+### What This Means
+
+The mismatches are not **design limitations** — they are **encoding coverage
+gaps**. The framework's core engine already supports the exact mechanism
+needed to close them: **stratified defeasible reasoning**.
+
+Each legal rule can override a lower layer's verdict, and the entire
+override chain is preserved as a type-level proof term:
+
+```haskell
+-- Base rule application
+JBase     :: Verdict → ArticleRef → Text → Judgment '[l]
+-- Higher layer overrides lower layer's verdict
+JOverride :: Judgment prev → Verdict → ArticleRef → Text → Judgment (l ': prev)
+-- Higher layer delegates (does not override)
+JDelegate :: Judgment prev → Judgment (l ': prev)
+```
+
+To close the gaps identified above:
+
+**98다60828** — Add an `AgentIdentifiableWithCounterparty` fact. When present,
+a new layer overrides §110②'s third-party fraud restriction. The existing
+§110 rules remain untouched.
+
+**2013다49794** — Add a `CounterpartyExploitedMistake` fact. When present,
+a new layer overrides §109's gross-negligence bar. The existing §109 rule
+remains untouched.
+
+**91다32190** — Add a `DelegatedFactualActOnly` fact. When present,
+it blocks §126 apparent authority from applying as a precondition. The
+existing §126 rule remains untouched.
+
+Each extension adds **new fact types and new layers** without modifying
+existing rules. This is the defeasible reasoning engine working as designed.
+
+### The Verification Pipeline as a Development Tool
+
+This comparison pipeline mechanically identifies where the framework
+needs to grow:
+
+1. Encode a court case as facts
+2. Generate framework output (purely mechanical)
+3. A zero-context LLM compares output against the actual judgment
+4. Each mismatch **is** the next doctrine to encode
+
+Mismatch ≠ failure. Mismatch = next work item.
 """
 
 APPENDIX = """\
@@ -76,27 +142,23 @@ APPENDIX = """\
 
 ### Match Verification Subagent
 
-각 판례에 대해, 프레임워크 출력과 실제 판결문의 일치 여부를 판정하기 위해
-LLM 서브에이전트를 사용하였다. 서브에이전트는 다음 조건으로 실행된다:
+Each case is verified by an LLM subagent that compares the framework
+output against the actual court judgment. The subagent operates under
+these constraints:
 
-- **모델**: Claude (claude-opus-4-6, Claude Code Agent tool 경유)
-- **제공 맥락**: 없음 (fulltext.md와 framework-output.md 두 파일만 제공)
-- **지시문**: [`scripts/directives/verify-match.md`](../../scripts/directives/verify-match.md)
+- **Model**: Claude (claude-opus-4-6 via Claude Code Agent tool)
+- **Context provided**: None — only `fulltext.md` and `framework-output.md`
+- **Directive**: [`scripts/directives/verify-match.md`](../../scripts/directives/verify-match.md)
 
-서브에이전트는 프로젝트 구조, Haskell 코드, 다른 판례에 대한 사전 지식 없이
-오직 두 문서만을 비교하여 YAML 형식의 판정 결과를 출력한다.
+The subagent has no knowledge of the project architecture, Haskell code,
+or any other case. It reads only the two specified files and outputs a
+YAML verdict.
 
-### 판정 기준
+### Match Criteria
 
-- **true**: 프레임워크의 최종 판단이 법원의 판시와 본질적으로 일치
-- **partial**: 일부 쟁점에서 일치하나 다른 쟁점에서 불일치
-- **false**: 프레임워크의 결론이 법원의 판단과 모순
-
-### 한계
-
-현재 프레임워크는 민법 조문의 기본 규정만 인코딩하고 있어,
-판례법에 의해 확립된 예외 법리(묵시적 동의, 상대방 동일시 등)를
-반영하지 못한다. 이는 향후 확장 과제이다.
+- **true**: Framework's final judgment essentially aligns with the court's holding
+- **partial**: Alignment on some issues, divergence on others
+- **false**: Framework's conclusion contradicts the court's decision
 """
 
 
@@ -253,7 +315,7 @@ def build_case(case_name: str, case_num: int) -> str:
 
 
 def main():
-    parts = [CSS, HEADER]
+    parts = [CSS, HEADER, PIPELINE]
     for i, case_name in enumerate(CASE_ORDER, 1):
         case_dir = os.path.join(os.path.abspath(CASES_DIR), case_name)
         if not os.path.isdir(case_dir):
@@ -262,7 +324,7 @@ def main():
         parts.append(build_case(case_name, i))
         parts.append("---\n")
 
-    parts.append(PIPELINE)
+    parts.append(ANALYSIS)
     parts.append(APPENDIX)
 
     output = os.path.abspath(OUTPUT)
