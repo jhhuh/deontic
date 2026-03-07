@@ -108,29 +108,18 @@ def read_file(path: str) -> str | None:
 
 
 def identity_grid(case_data: dict) -> str:
-    """Build identity section as a side-by-side grid."""
+    """Build identity section as a markdown table with id, role, haskell."""
     rows = case_data.get("identity", [])
     if not rows:
         return ""
     lines = []
-    lines.append('<div class="comparison-header">')
-    lines.append("<div>역할</div>")
-    lines.append("<div>Haskell</div>")
-    lines.append("</div>")
-    lines.append('<div class="comparison" markdown>')
-    lines.append("<div markdown>")
-    lines.append("")
+    lines.append("| ID | 역할 | Haskell |")
+    lines.append("|:---|:-----|:--------|")
     for row in rows:
-        lines.append(f"- {row['role']}")
-    lines.append("")
-    lines.append("</div>")
-    lines.append("<div markdown>")
-    lines.append("")
-    for row in rows:
-        lines.append(f"- `{row['haskell']}`")
-    lines.append("")
-    lines.append("</div>")
-    lines.append("</div>")
+        rid = row.get("id", "")
+        role = row.get("role", "")
+        haskell = row.get("haskell", "")
+        lines.append(f"| `{rid}` | {role} | `{haskell}` |")
     return "\n".join(lines)
 
 

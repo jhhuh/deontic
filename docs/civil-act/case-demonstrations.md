@@ -26,28 +26,12 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 미성년자 (만 19세, 신용구매계약 체결자)
-- 법정대리인
-- 신용카드 가맹점 (상대방)
-- 신용구매계약
-
-</div>
-<div markdown>
-
-- `PersonId "minor"`
-- `PersonId "guardian"`
-- `PersonId "merchant"`
-- `ActId "contract"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `minor` | 미성년자 (만 19세, 신용구매계약 체결자) | `PersonId "minor"` |
+| `guardian` | 법정대리인 | `PersonId "guardian"` |
+| `merchant` | 신용카드 가맹점 (상대방) | `PersonId "merchant"` |
+| `contract` | 신용구매계약 | `ActId "contract"` |
 
 ### Fact Translation
 
@@ -127,28 +111,12 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 소외 회사 (태영공영, 부동산 원소유자)
-- 소외 1 (허위 가등기 명의인)
-- 피고들 (소외 2로부터 양수한 자, 선의 여부 미심리)
-- 소외 회사-소외 1 간 허위 매매예약
-
-</div>
-<div markdown>
-
-- `PersonId "corp"`
-- `PersonId "sooe1"`
-- `PersonId "defendants"`
-- `ActId "sham-reservation"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `corp` | 소외 회사 (태영공영, 부동산 원소유자) | `PersonId "corp"` |
+| `sooe1` | 소외 1 (허위 가등기 명의인) | `PersonId "sooe1"` |
+| `defendants` | 피고들 (소외 2로부터 양수한 자, 선의 여부 미심리) | `PersonId "defendants"` |
+| `sham-act` | 소외 회사-소외 1 간 허위 매매예약 | `ActId "sham-reservation"` |
 
 ### Fact Translation
 
@@ -227,28 +195,12 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 갑 (부동산 소유자)
-- 을 (허위 가등기 수령자)
-- 무 (최종 매수인, 제3자 해당 여부 쟁점)
-- 갑-을 간 허위 매매예약
-
-</div>
-<div markdown>
-
-- `PersonId "gap"`
-- `PersonId "eul"`
-- `PersonId "mu"`
-- `ActId "sham-reservation"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `gap` | 갑 (부동산 소유자) | `PersonId "gap"` |
+| `eul` | 을 (허위 가등기 수령자) | `PersonId "eul"` |
+| `mu` | 무 (최종 매수인, 제3자 해당 여부 쟁점) | `PersonId "mu"` |
+| `sham-act` | 갑-을 간 허위 매매예약 | `ActId "sham-reservation"` |
 
 ### Fact Translation
 
@@ -327,26 +279,11 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 표의자 (착오로 의사표시를 한 자)
-- 상대방 (착오를 알고 이용한 자)
-- 의사표시 (착오 있는 법률행위)
-
-</div>
-<div markdown>
-
-- `PersonId "declarant"`
-- `PersonId "counterparty"`
-- `ActId "declaration"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `declarant` | 표의자 (착오로 의사표시를 한 자) | `PersonId "declarant"` |
+| `counterparty` | 상대방 (착오를 알고 이용한 자) | `PersonId "counterparty"` |
+| `declaration` | 의사표시 (착오 있는 법률행위) | `ActId "declaration"` |
 
 ### Fact Translation
 
@@ -423,28 +360,12 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 원고 은행 (상대방)
-- 피고들 (사기에 의해 약정한 자)
-- 출장소장 (은행과 동일시되는 자, 사기 행위자)
-- 금전소비대차 및 연대보증 약정
-
-</div>
-<div markdown>
-
-- `PersonId "bank"`
-- `PersonId "defendants"`
-- `PersonId "branchMgr"`
-- `ActId "agreement"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `bank` | 원고 은행 (상대방) | `PersonId "bank"` |
+| `defendants` | 피고들 (사기에 의해 약정한 자) | `PersonId "defendants"` |
+| `branch-mgr` | 출장소장 (은행과 동일시되는 자, 사기 행위자) | `PersonId "branchMgr"` |
+| `agreement` | 금전소비대차 및 연대보증 약정 | `ActId "agreement"` |
 
 ### Fact Translation
 
@@ -521,28 +442,12 @@ The framework output is **purely mechanical** — once facts are mapped, no huma
 
 ### Identity
 
-<div class="comparison-header">
-<div>역할</div>
-<div>Haskell</div>
-</div>
-<div class="comparison" markdown>
-<div markdown>
-
-- 증권회사 (본인)
-- 사실상 투자상담사 (무권대리인)
-- 고객/투자자 (상대방)
-- 예탁금 수령 및 위탁매매계약
-
-</div>
-<div markdown>
-
-- `PersonId "principal"`
-- `PersonId "agent"`
-- `PersonId "counterparty"`
-- `ActId "contract"`
-
-</div>
-</div>
+| ID | 역할 | Haskell |
+|:---|:-----|:--------|
+| `principal` | 증권회사 (본인) | `PersonId "principal"` |
+| `agent` | 사실상 투자상담사 (무권대리인) | `PersonId "agent"` |
+| `counterparty` | 고객/투자자 (상대방) | `PersonId "counterparty"` |
+| `contract` | 예탁금 수령 및 위탁매매계약 | `ActId "contract"` |
 
 ### Fact Translation
 
