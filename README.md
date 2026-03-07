@@ -30,6 +30,8 @@ This project resolves the tension by encoding **override layers as a type-level 
 - **Open**: Layers, facts, and act types are all extensible via type families — no modification to the core framework needed
 - **Proof-as-sentence**: The `Judgment` GADT can be rendered as a Korean legal reasoning chain (판결문)
 
+**Beyond first-order defeasibility.** Standard defeasible logics (Governatori, Prakken-Sartor) handle rule priorities but cannot express rules that operate on other rules' *outputs*. Statute law requires this: cancellation (취소) operates on a prior verdict, and legal fictions like "deemed fulfilled" (§150) require counterfactual re-evaluation. This framework handles both — type-level resolution for first-order defeasibility, value-level Haskell for second-order meta-rules. See [the full analysis](docs/theory/second-order-defeasibility.md).
+
 ## Project Structure
 
 ```
