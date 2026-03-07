@@ -23,6 +23,7 @@ library
     Deontic.Civil.SaleWarranty
     Deontic.Civil.Lease
     Deontic.Civil.AgencyRemedies
+    Deontic.Civil.Invalidity
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
@@ -95,6 +96,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.SaleWarrantySpec
     Deontic.Civil.LeaseSpec
     Deontic.Civil.AgencyRemediesSpec
+    Deontic.Civil.InvaliditySpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover
