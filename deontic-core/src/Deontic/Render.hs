@@ -26,9 +26,10 @@ data Step = Step
 
 -- | What happened at each layer of the reasoning chain.
 data StepKind
-  = Applied    -- ^ Base rule was applied directly
-  | Overridden -- ^ This layer overrode a lower layer's verdict
-  | Delegated  -- ^ This layer delegated to a lower layer (no override)
+  = Applied        -- ^ Base rule was applied directly
+  | Overridden     -- ^ This layer overrode a lower layer's verdict
+  | Delegated      -- ^ This layer delegated to a lower layer (no override)
+  | Counterfactual -- ^ This layer applied a counterfactual (§150-style)
   deriving (Eq, Show)
 
 -- | Extract the reasoning steps from a Judgment GADT (bottom-up)
@@ -39,6 +40,8 @@ judgmentSteps (JOverride prev v ref txt) =
   judgmentSteps prev ++ [Step Overridden v ref txt]
 judgmentSteps (JDelegate prev) =
   judgmentSteps prev
+judgmentSteps (JCounterfactual prev _hyp v ref txt) =
+  judgmentSteps prev ++ [Step Counterfactual v ref txt]
 
 -- | Extract steps from an existentially-wrapped judgment
 someJudgmentSteps :: SomeJudgment -> [Step]

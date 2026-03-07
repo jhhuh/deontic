@@ -32,12 +32,17 @@ data Judgment (layers :: [Type]) where
   -- | This layer was available but delegated (did not override)
   JDelegate :: Judgment prev
             -> Judgment (l ': prev)
+  -- | Counterfactual: §150-style "deemed fulfilled/unfulfilled"
+  --   Carries the hypothetical reasoning chain as a SomeJudgment
+  JCounterfactual :: Judgment prev -> SomeJudgment -> Verdict -> ArticleRef -> Text
+                  -> Judgment (l ': prev)
 
 -- | Extract the final verdict from any judgment
 verdict :: Judgment layers -> Verdict
-verdict (JBase v _ _)        = v
-verdict (JOverride _ v _ _)  = v
-verdict (JDelegate prev)     = verdict prev
+verdict (JBase v _ _)                = v
+verdict (JOverride _ v _ _)          = v
+verdict (JDelegate prev)             = verdict prev
+verdict (JCounterfactual _ _ v _ _)  = v
 
 -- | Core typeclass: stratified adjudication
 class Adjudicate act (layers :: [Type]) where

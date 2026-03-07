@@ -73,17 +73,19 @@ instance Adjudicate ConditionalAct rest
       -- 성취 의제: re-evaluate as if condition fulfilled
       let deemedFacts = facts { condState = CondFulfilled, condBadFaith = Nothing }
           deemedResult = query act deemedFacts
-      in JOverride (adjudicate @_ @rest act facts)
-                   (verdict deemedResult)
-                   (ArticleRef "민법" 150 (Just 1))
-                   "조건의 성취로 인하여 불이익을 받을 당사자가 신의성실에 반하여 조건의 성취를 방해한 때에는 상대방은 그 조건이 성취한 것으로 주장할 수 있다."
+      in JCounterfactual (adjudicate @_ @rest act facts)
+                         (SomeJudgment deemedResult)
+                         (verdict deemedResult)
+                         (ArticleRef "민법" 150 (Just 1))
+                         "조건의 성취로 인하여 불이익을 받을 당사자가 신의성실에 반하여 조건의 성취를 방해한 때에는 상대방은 그 조건이 성취한 것으로 주장할 수 있다."
     Just BadFaithCausation ->
       -- 불성취 의제: re-evaluate as if condition pending
       let deemedFacts = facts { condState = CondPending, condBadFaith = Nothing }
           deemedResult = query act deemedFacts
-      in JOverride (adjudicate @_ @rest act facts)
-                   (verdict deemedResult)
-                   (ArticleRef "민법" 150 (Just 2))
-                   "조건의 성취로 인하여 이익을 받을 당사자가 신의성실에 반하여 조건을 성취시킨 때에는 상대방은 그 조건이 성취하지 아니한 것으로 주장할 수 있다."
+      in JCounterfactual (adjudicate @_ @rest act facts)
+                         (SomeJudgment deemedResult)
+                         (verdict deemedResult)
+                         (ArticleRef "민법" 150 (Just 2))
+                         "조건의 성취로 인하여 이익을 받을 당사자가 신의성실에 반하여 조건을 성취시킨 때에는 상대방은 그 조건이 성취하지 아니한 것으로 주장할 수 있다."
     Nothing ->
       JDelegate (adjudicate @_ @rest act facts)

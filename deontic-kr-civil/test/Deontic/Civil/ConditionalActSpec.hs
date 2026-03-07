@@ -70,3 +70,12 @@ spec = do
     it "§150②: 해제조건 + 성취야기 → Valid (불성취 의제)" $ do
       let j = query act (ConditionalFacts Resolutive CondFulfilled (Just BadFaithCausation))
       verdict j `shouldBe` Valid
+
+    it "§150①: counterfactual carries hypothetical judgment" $ do
+      let j = query act (ConditionalFacts Suspensive CondPending (Just BadFaithPrevention))
+      case j of
+        JCounterfactual _ (SomeJudgment hyp) v _ _ -> do
+          v `shouldBe` Valid
+          -- hypothetical: re-evaluated as if condition fulfilled
+          verdict hyp `shouldBe` Valid
+        _ -> expectationFailure "expected JCounterfactual constructor"

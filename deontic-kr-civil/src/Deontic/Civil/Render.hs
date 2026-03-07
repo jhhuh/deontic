@@ -92,15 +92,17 @@ stepBlocks s =
 
 -- | Human-readable label for each step kind
 kindLabel :: StepKind -> Text
-kindLabel Applied    = "근거"
-kindLabel Overridden = "번복"
-kindLabel Delegated  = "검토"
+kindLabel Applied        = "근거"
+kindLabel Overridden     = "번복"
+kindLabel Delegated      = "검토"
+kindLabel Counterfactual = "의제"
 
 -- | Suffix appended to article reference
 kindSuffix :: StepKind -> Text
-kindSuffix Applied    = "에 의하면,"
-kindSuffix Overridden = "에 의하여,"
-kindSuffix Delegated  = "을 검토하였으나 해당 없어,"
+kindSuffix Applied        = "에 의하면,"
+kindSuffix Overridden     = "에 의하여,"
+kindSuffix Delegated      = "을 검토하였으나 해당 없어,"
+kindSuffix Counterfactual = "에 의하여 의제하면,"
 
 verdictText :: Verdict -> Text
 verdictText Valid    = "본 법률행위는 유효하다."
