@@ -63,6 +63,7 @@ nav:
     - Deontic Logic: theory/deontic-logic.md
     - Curry-Howard Isomorphism: theory/curry-howard.md
     - Defeasible Reasoning: theory/defeasibility.md
+    - Second-Order Defeasibility: theory/second-order-defeasibility.md
   - Framework:
     - framework/index.md
     - Core Architecture: framework/core.md

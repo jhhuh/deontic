@@ -194,7 +194,7 @@ Layers are composable building blocks, not hardcoded to a specific stack.
 - **SPINdle** (Governatori) — Defeasible logic engine; Prolog-style, no type-level guarantees
 - **Pfenning-Davies** — Curry-Howard for modal logic; foundational but not deontic-specific
 
-This project differs by using GHC's type system itself as the logic engine — defeasibility is resolved at the type level, and the proof term is a first-class value.
+This project differs by using GHC's type system itself as the logic engine — defeasibility is resolved at the type level, and the proof term is a first-class value. Additionally, we identify a **second-order gap** in defeasible deontic logic: standard frameworks cannot express meta-rules (rules on evaluation outputs) or counterfactual re-evaluation (legal fictions like "deemed fulfilled"). Our framework fills this gap by combining type-level defeasibility with value-level Haskell computation. See [Second-Order Defeasibility](docs/theory/second-order-defeasibility.md) for the full analysis.
 
 ## Building
 

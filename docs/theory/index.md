@@ -10,6 +10,7 @@ we use.
 2. **[Deontic Logic](deontic-logic.md)** — obligation, permission, and normative reasoning
 3. **[Curry-Howard Isomorphism](curry-howard.md)** — propositions as types, proofs as programs
 4. **[Defeasible Reasoning](defeasibility.md)** — how we extend Curry-Howard to handle legal exceptions
+5. **[Second-Order Defeasibility](second-order-defeasibility.md)** — meta-rules and counterfactual re-evaluation beyond the standard logic
 
 Each section builds on the previous one. If you're already familiar with a topic,
 feel free to skip ahead.

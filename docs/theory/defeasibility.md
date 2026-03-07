@@ -169,3 +169,14 @@ What we do have is a **structural guarantee**: every judgment has consulted
 every applicable layer in the correct order, and the reasoning chain is
 preserved in the proof term. This is stronger than any runtime system but
 weaker than a full formal verification.
+
+## Beyond First-Order: Second-Order Defeasibility
+
+The encoding described above is first-order: facts go in, a verdict comes
+out. But some legal rules operate on the *outputs* of other evaluations
+(meta-rules like cancellation) or require *counterfactual re-evaluation*
+(legal fictions like "deemed fulfilled"). These patterns go beyond what
+standard defeasible deontic logic can express.
+
+See **[Second-Order Defeasibility](second-order-defeasibility.md)** for
+the full analysis of this gap and how our framework addresses it.
