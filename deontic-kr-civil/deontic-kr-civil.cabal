@@ -25,6 +25,7 @@ library
     Deontic.Civil.AgencyRemedies
     Deontic.Civil.Invalidity
     Deontic.Civil.Cancellation
+    Deontic.Civil.ConditionalAct
     Deontic.Civil.Render
   hs-source-dirs: src
   build-depends:
@@ -99,6 +100,7 @@ test-suite deontic-kr-civil-test
     Deontic.Civil.AgencyRemediesSpec
     Deontic.Civil.InvaliditySpec
     Deontic.Civil.CancellationSpec
+    Deontic.Civil.ConditionalActSpec
     Deontic.Civil.RenderSpec
   build-tool-depends:
     hspec-discover:hspec-discover
