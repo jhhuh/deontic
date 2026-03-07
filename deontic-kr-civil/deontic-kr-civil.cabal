@@ -27,6 +27,7 @@ library
     Deontic.Civil.Cancellation
     Deontic.Civil.ConditionalAct
     Deontic.Civil.Render
+    Deontic.Civil.Evaluate
   hs-source-dirs: src
   build-depends:
     base       >= 4.17 && < 5,

@@ -105,6 +105,7 @@ module Deontic.Civil
   , module Deontic.Civil.Cancellation
   , module Deontic.Civil.ConditionalAct
   , module Deontic.Civil.Render
+  , module Deontic.Civil.Evaluate
   ) where
 
 import Deontic.Civil.Types
@@ -126,3 +127,4 @@ import Deontic.Civil.Invalidity ()
 import Deontic.Civil.Cancellation ()
 import Deontic.Civil.ConditionalAct ()
 import Deontic.Civil.Render
+import Deontic.Civil.Evaluate
